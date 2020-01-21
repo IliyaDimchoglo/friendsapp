@@ -10,5 +10,5 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetAllInvitationsResponse {
-    List<String> friendsNames;
+    private List<String> friendsNames;
 }

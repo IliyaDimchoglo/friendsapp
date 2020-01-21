@@ -6,7 +6,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.UUID;
 
 @Data
 @Entity
@@ -15,27 +14,28 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 public class FriendEntity extends BaseUpdatedEntity {
 
-    @Column(nullable = false)
-    private UUID userId;
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private AccountEntity account;
+
+    @ManyToOne
+    @JoinColumn(name = "friend_id")
+    private AccountEntity friend;
 
     @Enumerated(EnumType.STRING)
     private FriendStatus status;
 
-    @ManyToOne
-    @JoinColumn(name = "account_id")
-    private AccountEntity accountEntity;
-
-    public FriendEntity(UUID userId, AccountEntity accountEntity) {
-        this.userId = userId;
-        this.status = FriendStatus.ACTIVE;
-        this.accountEntity = accountEntity;
+    public FriendEntity(AccountEntity account, AccountEntity friendAccount) {
+        status = FriendStatus.ACTIVE;
+        this.friend = friendAccount;
+        this.account = account;
     }
 
-    public void delete(){
+    public void delete() {
         status = FriendStatus.DELETED;
     }
 
-    public boolean isActive(){
+    public boolean isActive() {
         return status.equals(FriendStatus.ACTIVE);
     }
 }

@@ -1,6 +1,7 @@
 package com.skysoft.business.api.model;
 
 import com.skysoft.business.api.dto.request.UpdateAccountRequest;
+import com.skysoft.business.api.exception.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,12 +10,13 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.util.StringUtils;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
+import javax.persistence.*;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static com.skysoft.business.api.model.FriendStatus.DELETED;
 
 @Data
 @Entity
@@ -23,6 +25,7 @@ import java.util.UUID;
 public class AccountEntity {
 
     @Id
+    @GeneratedValue
     @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID id;
 
@@ -56,8 +59,7 @@ public class AccountEntity {
 
     private String address;
 
-    public AccountEntity(UUID id, UUID accessId, AccessRequestEntity request) {
-        this.id = id;
+    public AccountEntity(UUID accessId, AccessRequestEntity request) {
         this.accessId = accessId;
         this.email = request.getEmail();
         this.username = request.getUsername();
@@ -88,6 +90,5 @@ public class AccountEntity {
         }
         return updated;
     }
-
 
 }

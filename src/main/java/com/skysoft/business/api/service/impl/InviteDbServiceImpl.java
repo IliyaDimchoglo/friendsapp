@@ -1,7 +1,5 @@
 package com.skysoft.business.api.service.impl;
 
-import com.skysoft.business.api.exception.BadRequestException;
-import com.skysoft.business.api.exception.NotFoundException;
 import com.skysoft.business.api.model.InviteEntity;
 import com.skysoft.business.api.model.InviteStatus;
 import com.skysoft.business.api.repository.InviteRepository;
@@ -12,9 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-
-import static com.skysoft.business.api.model.InviteStatus.*;
 
 @Slf4j
 @Service
@@ -24,41 +19,24 @@ public class InviteDbServiceImpl implements InviteDBService {
     private final InviteRepository inviteRepository;
 
     @Override
-    public void resetInviteRequest(UUID id, UUID friendId) {
-            InviteEntity inviteEntity = inviteRepository.findFirstByAccountIdAndFriendIdAndInviteStatus(id, friendId, ACCEPT)
-                    .orElseThrow(() -> new NotFoundException("Invite not found."));
-            inviteEntity.setInviteStatus(REJECT);
-            save(inviteEntity);
-            log.info("[x] Invite request reset.");
+    public List<InviteEntity> findAllInvitesByAccountUsernameAndStatus(String username, InviteStatus inviteStatus) {
+        return inviteRepository.findAllByFriend_UsernameAndInviteStatus(username, inviteStatus);
     }
 
     @Override
-    public List<InviteEntity> findAll(UUID id, InviteStatus inviteStatus) {
-        return inviteRepository.findAllByAccountIdAndInviteStatus(id, inviteStatus);
+    public Optional<InviteEntity> getOptionalByAccountUsernameAndStatus(String username, InviteStatus inviteStatus) {
+        return inviteRepository.findFirstByAccount_UsernameAndInviteStatus(username, inviteStatus);
     }
 
     @Override
-    public Optional<InviteEntity> getOptionalByAccountIdAndStatus(UUID accountId, InviteStatus inviteStatus) {
-        return inviteRepository.findFirstByAccountIdAndInviteStatus(accountId, inviteStatus);
-    }
-
-    @Override
-    public boolean existsInvite(UUID accountId, UUID friendId) {
-        if (inviteRepository.existsByAccountIdAndFriendIdAndInviteStatus(accountId, friendId, PENDING)) {
-            return true;
-        } else
-            return inviteRepository.existsByAccountIdAndFriendIdAndInviteStatus(accountId, friendId, ACCEPT);
+    public InviteEntity findInvite(String username, String friendName) {
+        return inviteRepository.findFirstByAccount_UsernameAndFriend_UsernameOrFriend_UsernameAndAccount_Username(
+                username, friendName, friendName, username);
     }
 
     @Override
     public void save(InviteEntity entity) {
-        try {
-            inviteRepository.save(entity);
-            log.info("[x] Invite was successful saved.");
-        }catch (Exception e){
-            log.warn("[x] Failed save invite with message: {}",e.getMessage());
-            throw new BadRequestException("Failed save invite.");
-        }
+        inviteRepository.save(entity);
+        log.info("[x] Invite was successful saved.");
     }
-
 }

@@ -16,37 +16,34 @@ import javax.validation.Valid;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/api/account")
+@RequestMapping("/api/accounts")
 public class AccountController {
 
     private final AccountService accountService;
 
-    @GetMapping
-    public ResponseEntity<Void> getAvailabilityUser(@RequestBody AvailabilityUserRequest request) {
-        return accountService.existByUsernameAndEmail(request.getUsername(), request.getEmail());
-    }
 
-    @GetMapping("/get_accounts")
+    @GetMapping
     public ResponseEntity<GetAllAccountsResponse> getAllAccounts() {
         return accountService.getAllAccounts();
     }
 
-
-
-    @GetMapping("/account_info")
+    @GetMapping("/info")
     public ResponseEntity<AccountDetailsDto> getAccountInfo(CurrentUser currentUser) {
         return accountService.getAccountInfo(currentUser);
     }
 
-    @PatchMapping("/update_info")
+    @PatchMapping("/update")
     public ResponseEntity<Void> updateAccountInfo(@Valid @RequestBody UpdateAccountRequest updateAccountRequest, CurrentUser currentUser) {
         return accountService.updateAccountInfo(updateAccountRequest, currentUser);
     }
-
 
     @PatchMapping("/avatar")
     public ResponseEntity<Void> updateAvatar(@RequestParam(name = "avatar") MultipartFile avatar, CurrentUser user) {
         return accountService.updateAvatar(avatar, user);
     }
 
+    @PostMapping
+    public ResponseEntity<Void> getAvailabilityUser(@Valid @RequestBody AvailabilityUserRequest request) {
+        return accountService.existByUsernameAndEmail(request.getUsername(), request.getEmail());
+    }
 }

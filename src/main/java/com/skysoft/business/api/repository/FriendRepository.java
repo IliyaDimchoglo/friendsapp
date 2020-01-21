@@ -9,6 +9,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface FriendRepository extends JpaRepository<FriendEntity, UUID> {
-    List<FriendEntity> findAllByUserId(UUID id);
-    Optional<FriendEntity> findFirstByUserIdAndAccountEntity_IdAndStatus(UUID id, UUID friendId, FriendStatus friendStatus);
+
+    List<FriendEntity> findFriendEntitiesByAccount_UsernameAndStatusOrFriend_UsernameAndStatus(String username, FriendStatus accountStatus, String friendName, FriendStatus status);
+
+    Optional<FriendEntity> findFriendEntityByAccount_UsernameAndFriend_UsernameAndStatusOrFriend_UsernameAndAccount_UsernameAndStatus(String accountUsername, String friendName, FriendStatus status1, String friendUsername, String accountName, FriendStatus status2);
+
+    FriendEntity findFirstByFriend_Username(String username);
 }

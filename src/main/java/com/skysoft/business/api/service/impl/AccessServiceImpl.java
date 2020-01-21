@@ -32,7 +32,7 @@ public class AccessServiceImpl implements AccessService {
     @Override
     public void confirmAccess(String email, String confirmationCode) {
         AccessRequestEntity entity = accessDBService.findByEmailAndConfirmationCode(email, confirmationCode)
-                .orElseThrow(() -> new NotFoundException("email or confirmationCode not fount"));
+                .orElseThrow(() -> new NotFoundException("email or confirmationCode not valid"));
         entity.setConfirmed(true);
         AccountEntity accountEntity = accountService.registerNewAccount(entity);
         accessDBService.confirmAccessRequest(entity, accountEntity);

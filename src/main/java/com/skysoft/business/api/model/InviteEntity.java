@@ -2,10 +2,7 @@ package com.skysoft.business.api.model;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 import java.util.UUID;
 
 import static com.skysoft.business.api.model.InviteStatus.*;
@@ -17,16 +14,18 @@ import static com.skysoft.business.api.model.InviteStatus.*;
 @EqualsAndHashCode(callSuper = true)
 public class InviteEntity extends BaseCreatedEntity{
 
-    @Column(nullable = false)
-    private UUID accountId;
+    @ManyToOne
+    @JoinColumn(name = "account_id")
+    private AccountEntity account;
 
-    @Column(nullable = false)
-    private UUID friendId;
+    @ManyToOne
+    @JoinColumn(name = "friend_id")
+    private AccountEntity friend;
 
     @Enumerated(EnumType.STRING)
     private InviteStatus inviteStatus;
 
-    public static InviteEntity setAccountAndFriend(UUID accountId, UUID friendId){
+    public static InviteEntity of(AccountEntity accountId, AccountEntity friendId){
         return new InviteEntity(accountId,friendId, PENDING);
     }
 }

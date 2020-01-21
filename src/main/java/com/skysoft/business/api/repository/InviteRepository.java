@@ -9,8 +9,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface InviteRepository extends JpaRepository<InviteEntity, UUID> {
-    List<InviteEntity> findAllByAccountIdAndInviteStatus(UUID id, InviteStatus inviteStatus);
-    Optional<InviteEntity> findFirstByAccountIdAndInviteStatus(UUID id, InviteStatus inviteStatus);
-    Optional<InviteEntity> findFirstByAccountIdAndFriendIdAndInviteStatus(UUID id, UUID friendId, InviteStatus inviteStatus);
-    boolean existsByAccountIdAndFriendIdAndInviteStatus(UUID accountId, UUID friendId, InviteStatus inviteStatus);
+
+    List<InviteEntity> findAllByFriend_UsernameAndInviteStatus(String username, InviteStatus inviteStatus);
+
+    Optional<InviteEntity> findFirstByAccount_UsernameAndInviteStatus(String username, InviteStatus inviteStatus);
+
+    InviteEntity findFirstByAccount_UsernameAndFriend_UsernameOrFriend_UsernameAndAccount_Username(
+            String username, String friendName, String friendUsername, String accountName);
 }

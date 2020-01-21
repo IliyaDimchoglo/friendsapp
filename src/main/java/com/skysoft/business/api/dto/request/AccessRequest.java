@@ -2,11 +2,15 @@ package com.skysoft.business.api.dto.request;
 
 
 import com.skysoft.business.api.model.AccessRequestEntity;
+import com.sun.istack.internal.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.util.Random;
 
 @Data
@@ -14,13 +18,16 @@ import java.util.Random;
 @AllArgsConstructor
 public class AccessRequest {
 
-    @NotBlank
+    @NotNull
+    @Pattern(regexp = "^[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$", message = "Invalid email.")
     private String email;
 
-    @NotBlank
+    @NotNull
+    @Length(min = 4, max = 9)
     private String username;
 
-    @NotBlank
+    @NonNull
+    @Length(min = 4, max = 9)
     private String password;
 
     public AccessRequestEntity toEntity(){

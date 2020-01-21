@@ -10,6 +10,7 @@ import com.skysoft.business.api.model.AccountEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,11 +29,5 @@ public interface AccountService {
     ResponseEntity<Void> existByUsernameAndEmail(String firstName, String email);
 
     ResponseEntity<Void> updateAvatar(MultipartFile avatar, CurrentUser user);
-
-    Optional<AccountEntity> getOptionalById(UUID id);
-
-    default AccountEntity getAccountById(UUID id) {
-        return getOptionalById(id).orElseThrow(() -> new BadRequestException("Account not found"));
-    }
 }
 

@@ -32,8 +32,7 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
                 csrf().disable()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/access/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/availability").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/registration").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/accounts").permitAll()
                 .anyRequest().authenticated();
     }
 
@@ -43,7 +42,6 @@ public class OAuth2ResourceServerConfig extends ResourceServerConfigurerAdapter 
         oAuth2AuthenticationManager.setTokenServices(defaultTokenServices());
         resources.tokenServices(defaultTokenServices()).authenticationManager(oAuth2AuthenticationManager);
     }
-
 
     @Bean
     public ResourceServerTokenServices defaultTokenServices() {

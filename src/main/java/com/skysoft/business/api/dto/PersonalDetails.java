@@ -19,7 +19,7 @@ public class PersonalDetails {
     private String email;
     private String phoneNumber;
 
-    public static PersonalDetails of(AccountEntity entity){
+    public static PersonalDetails of(AccountEntity entity) {
         return new PersonalDetails(
                 entity.getUsername(),
                 entity.getFirstName(),
@@ -27,5 +27,6 @@ public class PersonalDetails {
                 entity.getAddress(),
                 entity.getEmail(),
                 entity.getPhoneNumber());
+
     }
 }

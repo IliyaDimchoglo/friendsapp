@@ -1,5 +1,6 @@
 package com.skysoft.business.api.dto;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,8 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AccountDetailsDto {
-
-    PersonalDetails personalDetails;
-
+public class AccountDto {
+    private String username;
+    private String email;
 }

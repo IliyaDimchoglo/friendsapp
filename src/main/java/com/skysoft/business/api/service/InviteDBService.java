@@ -6,21 +6,18 @@ import com.skysoft.business.api.model.InviteStatus;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface InviteDBService {
 
-    void resetInviteRequest(UUID id, UUID friendId);
+    List<InviteEntity> findAllInvitesByAccountUsernameAndStatus(String username, InviteStatus inviteStatus);
 
-    List<InviteEntity> findAll(UUID id, InviteStatus inviteStatus);
+    InviteEntity findInvite(String username, String friendName);
 
-    boolean existsInvite(UUID accountId, UUID friendId);
+    Optional<InviteEntity> getOptionalByAccountUsernameAndStatus(String username, InviteStatus inviteStatus);
 
-    Optional<InviteEntity> getOptionalByAccountIdAndStatus(UUID accountId, InviteStatus inviteStatus);
-
-    default InviteEntity getInviteEntityByAccountIdAndStatus(UUID accountId, InviteStatus inviteStatus){
-        return  getOptionalByAccountIdAndStatus(accountId, inviteStatus).orElseThrow(
-                () -> new NotFoundException("Invite Entity not found"));
+    default InviteEntity getInviteEntityByAccount_UsernameAndStatus(String username, InviteStatus inviteStatus){
+        return  getOptionalByAccountUsernameAndStatus(username, inviteStatus).orElseThrow(
+                () -> new NotFoundException("Invite not found"));
     }
 
     void save(InviteEntity entity);

@@ -8,19 +8,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/friend")
+@RequestMapping("/api/friends")
 public class FriendController {
+
     private final FriendService friendService;
 
-    @GetMapping("/get_all")
+    @GetMapping("/all")
     public ResponseEntity<GetAllFriendsResponse> getAllFriends(CurrentUser currentUser) {
         return friendService.getAllFriends(currentUser);
     }
 
-    @PostMapping("delete_friend")
-    public ResponseEntity<Void> deleteFriend(@RequestBody DeleteFriendRequest request, CurrentUser currentUser) {
+    @DeleteMapping("delete")
+    public ResponseEntity<Void> deleteFriend(@Valid @RequestBody DeleteFriendRequest request, CurrentUser currentUser) {
         return friendService.deleteFriend(request, currentUser);
     }
 }
