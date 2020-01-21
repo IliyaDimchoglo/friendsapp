@@ -19,8 +19,13 @@ public class InviteDbServiceImpl implements InviteDBService {
     private final InviteRepository inviteRepository;
 
     @Override
-    public List<InviteEntity> findAllInvitesByAccountUsernameAndStatus(String username, InviteStatus inviteStatus) {
+    public List<InviteEntity> findAllInvitesByFriendUsernameAndStatus(String username, InviteStatus inviteStatus) {
         return inviteRepository.findAllByFriend_UsernameAndInviteStatus(username, inviteStatus);
+    }
+
+    @Override
+    public List<InviteEntity> findAllInvitesByAccountUsernameAndStatus(String username, InviteStatus inviteStatus) {
+        return inviteRepository.findAllByAccount_UsernameAndInviteStatus(username, inviteStatus);
     }
 
     @Override

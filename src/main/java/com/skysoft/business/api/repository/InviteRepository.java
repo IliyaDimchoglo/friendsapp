@@ -12,6 +12,8 @@ public interface InviteRepository extends JpaRepository<InviteEntity, UUID> {
 
     List<InviteEntity> findAllByFriend_UsernameAndInviteStatus(String username, InviteStatus inviteStatus);
 
+    List<InviteEntity> findAllByAccount_UsernameAndInviteStatus(String username, InviteStatus inviteStatus);
+
     Optional<InviteEntity> findFirstByAccount_UsernameAndInviteStatus(String username, InviteStatus inviteStatus);
 
     InviteEntity findFirstByAccount_UsernameAndFriend_UsernameOrFriend_UsernameAndAccount_Username(

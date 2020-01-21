@@ -1,7 +1,6 @@
 package com.skysoft.business.api.model;
 
 import com.skysoft.business.api.dto.request.UpdateAccountRequest;
-import com.skysoft.business.api.exception.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,11 +11,7 @@ import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
-
-import static com.skysoft.business.api.model.FriendStatus.DELETED;
 
 @Data
 @Entity
