@@ -52,9 +52,14 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AccountEntity registerNewAccount(AccessRequestEntity request) {
         UUID accessId = request.getId();
-        AccountEntity accountEntity = accountRepository.save(new AccountEntity(accessId, request));
-        log.info("[x] Account registration finished. Account id {}", accountEntity.getId());
-        return accountEntity;
+        try {
+            AccountEntity accountEntity = accountRepository.save(new AccountEntity(accessId, request));
+            log.info("[x] Account registration finished. Account id {}", accountEntity.getId());
+            return accountEntity;
+        }catch (Exception e){
+            log.warn("Account registration failed with message: {}", e.getMessage());
+            throw new BadRequestException( "Account registration FAILED!");
+        }
     }
 
     @Override

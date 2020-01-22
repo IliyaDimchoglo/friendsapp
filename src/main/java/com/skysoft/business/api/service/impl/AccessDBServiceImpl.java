@@ -29,8 +29,8 @@ public class AccessDBServiceImpl implements AccessDBService {
     }
 
     @Override
-    public Optional<AccessRequestEntity> findByEmailAndConfirmationCode(String email, String confirmationCode) {
-        return accessRepository.findFirstByEmailAndConfirmationCode(email, confirmationCode);
+    public Optional<AccessRequestEntity> findByConfirmationCode(String confirmationCode) {
+        return accessRepository.findFirstByConfirmationCode(confirmationCode);
     }
 
     @Override

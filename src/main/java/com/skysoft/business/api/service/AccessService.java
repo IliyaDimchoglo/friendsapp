@@ -6,5 +6,5 @@ public interface AccessService {
 
     void createAccessRequest(AccessRequest request);
 
-    void confirmAccess(String email, String confirmationCode);
+    void confirmAccess(String confirmationCode);
 }

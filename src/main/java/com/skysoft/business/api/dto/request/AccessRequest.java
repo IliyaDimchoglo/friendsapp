@@ -12,6 +12,7 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.util.Random;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -35,7 +36,7 @@ public class AccessRequest {
                 .username(username)
                 .email(email)
                 .password(password)
-                .confirmationCode(String.valueOf(100000 + new Random().nextInt(9000000)))
+                .confirmationCode(UUID.randomUUID().toString())
                 .build();
     }
 }

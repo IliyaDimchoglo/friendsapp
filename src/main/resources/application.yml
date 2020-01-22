@@ -6,6 +6,7 @@ spring:
     port: 587
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
+    message: Thank you for registering. Please click on the below link to activate your account.
     default-encoding: UTF-8
     properties:
       mail:

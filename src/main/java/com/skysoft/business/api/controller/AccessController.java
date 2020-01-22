@@ -7,9 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -27,9 +25,9 @@ public class AccessController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/confirm")
-    public ResponseEntity<Void> confirmAccess(@Valid @RequestBody VerifyAccessRequest request){
-        accessService.confirmAccess(request.getEmail(), request.getConfirmationCode());
+    @GetMapping("/confirm")
+    public ResponseEntity<Void> confirmAccess(@RequestParam("confirmationCode") String confirmationCode){
+        accessService.confirmAccess(confirmationCode);
         return ResponseEntity.ok().build();
     }
 

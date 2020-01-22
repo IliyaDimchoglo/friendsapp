@@ -21,7 +21,6 @@ public class AccessServiceImpl implements AccessService {
     private final AccessDBService accessDBService;
     private final AccountService accountService;
 
-
     @Override
     public void createAccessRequest(AccessRequest request) {
         log.info("[x] Account registration request: {}", request);
@@ -30,13 +29,12 @@ public class AccessServiceImpl implements AccessService {
     }
 
     @Override
-    public void confirmAccess(String email, String confirmationCode) {
-        AccessRequestEntity entity = accessDBService.findByEmailAndConfirmationCode(email, confirmationCode)
-                .orElseThrow(() -> new NotFoundException("email or confirmationCode not valid"));
+    public void confirmAccess(String confirmationCode) {
+        AccessRequestEntity entity = accessDBService.findByConfirmationCode(confirmationCode)
+                .orElseThrow(() -> new NotFoundException("Confirmation Code is not valid."));
         entity.setConfirmed(true);
         AccountEntity accountEntity = accountService.registerNewAccount(entity);
         accessDBService.confirmAccessRequest(entity, accountEntity);
-        log.info("[x] Access successfully confirmed with email: {}", email);
+        log.info("[x] Access successfully confirmed with email {}:", entity.getEmail());
     }
-
 }

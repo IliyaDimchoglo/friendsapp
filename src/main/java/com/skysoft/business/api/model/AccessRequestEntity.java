@@ -22,6 +22,7 @@ public class AccessRequestEntity  extends BaseUpdatedEntity{
     @Column (nullable = false)
     private String password;
 
+    @Column(unique = true)
     private String confirmationCode;
 
     private boolean confirmed;

@@ -18,7 +18,7 @@ public interface AccessDBService {
                 .orElseThrow(() -> new NotFoundException("Access request with provided name was not found"));
     }
 
-    Optional<AccessRequestEntity> findByEmailAndConfirmationCode(String email, String confirmationCode);
+    Optional<AccessRequestEntity> findByConfirmationCode(String confirmationCode);
 
     void confirmAccessRequest(AccessRequestEntity accessRequest, AccountEntity accountEntity);
 }
