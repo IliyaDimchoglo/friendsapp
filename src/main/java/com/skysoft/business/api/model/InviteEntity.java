@@ -25,7 +25,7 @@ public class InviteEntity extends BaseCreatedEntity{
     @Enumerated(EnumType.STRING)
     private InviteStatus inviteStatus;
 
-    public static InviteEntity of(AccountEntity accountId, AccountEntity friendId){
-        return new InviteEntity(accountId,friendId, PENDING);
+    public static InviteEntity of(AccountEntity accountId, AccountEntity friendId, InviteStatus inviteStatus){
+        return new InviteEntity(accountId,friendId, inviteStatus);
     }
 }

@@ -19,9 +19,8 @@ public class AccessDBServiceImpl implements AccessDBService {
 
     @Override
     public AccessRequestEntity save(AccessRequestEntity entity) {
-        entity = accessRepository.save(entity);
-        log.info("[x] Successfully save access entity with id: {}.", entity.getId());
-        return entity;
+        return accessRepository.save(entity);
+
     }
 
     @Override

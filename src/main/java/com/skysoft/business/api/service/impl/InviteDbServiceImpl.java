@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.skysoft.business.api.model.InviteStatus.PENDING;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -20,23 +22,24 @@ public class InviteDbServiceImpl implements InviteDBService {
 
     @Override
     public List<InviteEntity> findAllInvitesByFriendUsernameAndStatus(String username, InviteStatus inviteStatus) {
-        return inviteRepository.findAllByFriend_UsernameAndInviteStatus(username, inviteStatus);
+        return inviteRepository.findAllByFriendUsernameAndInviteStatus(username, inviteStatus);
     }
 
     @Override
     public List<InviteEntity> findAllInvitesByAccountUsernameAndStatus(String username, InviteStatus inviteStatus) {
-        return inviteRepository.findAllByAccount_UsernameAndInviteStatus(username, inviteStatus);
+        return inviteRepository.findAllByAccountUsernameAndInviteStatus(username, inviteStatus);
     }
 
     @Override
     public Optional<InviteEntity> getOptionalByAccountUsernameAndStatus(String username, InviteStatus inviteStatus) {
-        return inviteRepository.findFirstByAccount_UsernameAndInviteStatus(username, inviteStatus);
+        return inviteRepository.findFirstByAccountUsernameAndInviteStatus(username, inviteStatus);
     }
 
     @Override
-    public InviteEntity findInvite(String username, String friendName) {
-        return inviteRepository.findFirstByAccount_UsernameAndFriend_UsernameOrFriend_UsernameAndAccount_Username(
-                username, friendName, friendName, username);
+    public boolean existInvite(String username, String friendName) {
+        return inviteRepository.existsByAccount_UsernameAndFriend_UsernameAndInviteStatus(username, friendName, PENDING)
+                || inviteRepository.existsByAccount_UsernameAndFriend_UsernameAndInviteStatus(friendName, username, PENDING);
+
     }
 
     @Override

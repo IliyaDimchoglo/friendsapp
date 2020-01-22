@@ -1,6 +1,8 @@
 package com.skysoft.business.api.service.impl;
 
 import com.skysoft.business.api.config.security.jwt.CurrentUser;
+import com.skysoft.business.api.dto.AccountDto;
+import com.skysoft.business.api.dto.IngoingInvitesDto;
 import com.skysoft.business.api.dto.OutgoingInvitesDto;
 import com.skysoft.business.api.dto.request.AddAccountToFriendsRequest;
 import com.skysoft.business.api.dto.request.InvitationRequest;
@@ -15,6 +17,7 @@ import com.skysoft.business.api.service.InviteDBService;
 import com.skysoft.business.api.service.InviteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -33,22 +36,22 @@ public class InviteServiceImpl implements InviteService {
     private final AccountService accountService;
     private final InviteDBService inviteDBService;
     private final FriendService friendService;
+    private final ModelMapper mapper;
 
     @Override
     public void sendInvite(AddAccountToFriendsRequest request, CurrentUser currentUser) {
         String username = currentUser.getUsername();
         String friendName = request.getUsername();
-        InviteEntity invite = inviteDBService.findInvite(username, friendName);
-        if (!friendName.equals(username)) {
-            if (Objects.isNull(invite) || invite.getInviteStatus().equals(REJECT)) {
+        isValid(friendName, username);
+        boolean exist = inviteDBService.existInvite(username, friendName);
+        if (!exist) {
                 inviteDBService.save(getInviteByAccountAndFriend(username, friendName));
                 log.info("[x] Successful send invite to account {}, for current user {}", friendName, username);
+            } else {
+                log.warn("[x] Bad request account {}, for invite {}", username, friendName);
+                throw new BadRequestException("Bad request for invite");
             }
-        } else {
-            log.warn("[x] Bad request account {}, for invite {}", username, friendName);
-            throw new BadRequestException("Bad request for invite");
         }
-    }
 
     @Override
     public ResponseEntity<Void> acceptInvitation(InvitationRequest request, CurrentUser currentUser) {
@@ -79,29 +82,36 @@ public class InviteServiceImpl implements InviteService {
     @Override
     public ResponseEntity<GetAllInvitationsResponse> getAllInvitations(CurrentUser currentUser) {
         String username = currentUser.getUsername();
-        List<String> namesList = inviteDBService.findAllInvitesByFriendUsernameAndStatus(username, PENDING)
-                .stream()
-                .map(InviteEntity::getAccount)
-                .map(AccountEntity::getUsername)
-                .collect(Collectors.toList());
+        IngoingInvitesDto ingoingInvites = getIngoingInvites(username);
         OutgoingInvitesDto outgoingInvites = getOutgoingInvites(username);
-        log.info("[x] Get all invitations {}, for current user: {}.", namesList.toString(), username);
-        return ResponseEntity.ok(new GetAllInvitationsResponse(namesList, outgoingInvites));
+        log.info("[x] Get all invitations for current user: {}.", username);
+        return ResponseEntity.ok(new GetAllInvitationsResponse(ingoingInvites, outgoingInvites));
     }
 
-    private OutgoingInvitesDto getOutgoingInvites(String username){
-        List<String> namesList = inviteDBService.findAllInvitesByAccountUsernameAndStatus(username, PENDING)
+    private IngoingInvitesDto getIngoingInvites(String username) {
+        List<AccountDto> namesList = inviteDBService.findAllInvitesByFriendUsernameAndStatus(username, PENDING)
+                .stream()
+                .map(InviteEntity::getAccount)
+                .map(entity -> mapper.map(entity, AccountDto.class))
+                .collect(Collectors.toList());
+        log.info("[x] Get all ingoing Invitations {}, for current user: {}.", namesList.toString(), username);
+        return IngoingInvitesDto.of(namesList);
+    }
+
+    private OutgoingInvitesDto getOutgoingInvites(String username) {
+        List<AccountDto> namesList = inviteDBService.findAllInvitesByAccountUsernameAndStatus(username, PENDING)
                 .stream()
                 .map(InviteEntity::getFriend)
-                .map(AccountEntity::getUsername)
+                .map(entity -> mapper.map(entity, AccountDto.class))
                 .collect(Collectors.toList());
         log.info("[x] Get all outgoing Invitations {}, for current user: {}.", namesList.toString(), username);
         return OutgoingInvitesDto.of(namesList);
     }
+
     private InviteEntity getInviteByAccountAndFriend(String username, String friend) {
         AccountEntity accountEntity = accountService.getAccountByUsername(username);
         AccountEntity friendEntity = accountService.getAccountByUsername(friend);
-        return InviteEntity.of(accountEntity, friendEntity);
+        return InviteEntity.of(accountEntity, friendEntity, PENDING);
     }
 
     private void setAcceptInviteStatus(InviteEntity entity) {
@@ -113,5 +123,12 @@ public class InviteServiceImpl implements InviteService {
         AccountEntity account = accountService.getAccountByUsername(username);
         AccountEntity friendAccount = accountService.getAccountByUsername(friendName);
         friendService.save(new FriendEntity(account, friendAccount));
+    }
+
+    private void isValid(String friendName, String username){
+        if(friendName.equals(username)){
+            log.warn("Friend with name {} is not valid for current user {}", friendName, username);
+            throw new BadRequestException("Friend is not valid");
+        }
     }
 }

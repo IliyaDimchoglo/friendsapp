@@ -7,6 +7,6 @@ import java.util.List;
 
 @Value(staticConstructor = "of")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class OutgoingInvitesDto {
+public class IngoingInvitesDto {
     private List<AccountDto> invitesList;
 }

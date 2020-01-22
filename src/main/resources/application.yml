@@ -24,7 +24,7 @@ spring:
     url: ${DATABASE_URL}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQL94Dialect
-    show-sql: false
+    show-sql: true
     database: postgresql
     generate-ddl: true
     open-in-view: true

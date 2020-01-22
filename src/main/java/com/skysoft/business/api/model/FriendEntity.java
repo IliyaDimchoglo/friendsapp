@@ -35,7 +35,4 @@ public class FriendEntity extends BaseUpdatedEntity {
         status = FriendStatus.DELETED;
     }
 
-    public boolean isActive() {
-        return status.equals(FriendStatus.ACTIVE);
-    }
 }

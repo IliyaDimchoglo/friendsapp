@@ -13,5 +13,6 @@ import javax.validation.constraints.NotNull;
 public class AddAccountToFriendsRequest {
 
     @NotNull
-    String username;
+    private String username;
+
 }

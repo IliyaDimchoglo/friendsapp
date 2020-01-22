@@ -13,7 +13,7 @@ public interface InviteDBService {
 
     List<InviteEntity> findAllInvitesByAccountUsernameAndStatus(String username, InviteStatus inviteStatus);
 
-    InviteEntity findInvite(String username, String friendName);
+    boolean existInvite(String username, String friendName);
 
     Optional<InviteEntity> getOptionalByAccountUsernameAndStatus(String username, InviteStatus inviteStatus);
 

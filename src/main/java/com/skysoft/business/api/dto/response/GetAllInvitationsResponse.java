@@ -2,6 +2,8 @@ package com.skysoft.business.api.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.skysoft.business.api.dto.AccountDto;
+import com.skysoft.business.api.dto.IngoingInvitesDto;
 import com.skysoft.business.api.dto.OutgoingInvitesDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,8 +16,9 @@ import java.util.List;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class GetAllInvitationsResponse {
-    @JsonProperty("friends_invites")
-    private List<String> friendsNames;
+
+    @JsonProperty("incoming_invites")
+    private IngoingInvitesDto incomingInvites;
 
     @JsonProperty("outgoing_invites")
     private OutgoingInvitesDto outgoingInvites;

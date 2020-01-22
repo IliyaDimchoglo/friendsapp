@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AccountDetailsDto {
 
-    PersonalDetails personalDetails;
+    private PersonalDetails personalDetails;
 
 }

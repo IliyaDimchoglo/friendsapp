@@ -9,13 +9,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface InviteRepository extends JpaRepository<InviteEntity, UUID> {
+    List<InviteEntity> findAllByFriendUsernameAndInviteStatus(String username, InviteStatus inviteStatus);
 
-    List<InviteEntity> findAllByFriend_UsernameAndInviteStatus(String username, InviteStatus inviteStatus);
+    List<InviteEntity> findAllByAccountUsernameAndInviteStatus(String username, InviteStatus inviteStatus);
 
-    List<InviteEntity> findAllByAccount_UsernameAndInviteStatus(String username, InviteStatus inviteStatus);
+    Optional<InviteEntity> findFirstByAccountUsernameAndInviteStatus(String username, InviteStatus inviteStatus);
 
-    Optional<InviteEntity> findFirstByAccount_UsernameAndInviteStatus(String username, InviteStatus inviteStatus);
-
-    InviteEntity findFirstByAccount_UsernameAndFriend_UsernameOrFriend_UsernameAndAccount_Username(
-            String username, String friendName, String friendUsername, String accountName);
+    boolean existsByAccount_UsernameAndFriend_UsernameAndInviteStatus(String username, String friendName, InviteStatus inviteStatus);
 }
