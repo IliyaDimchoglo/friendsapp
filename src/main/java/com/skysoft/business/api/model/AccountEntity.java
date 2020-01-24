@@ -1,20 +1,22 @@
 package com.skysoft.business.api.model;
 
 import com.skysoft.business.api.dto.request.UpdateAccountRequest;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.UUID;
 
 @Data
 @Entity
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccountEntity {
@@ -23,9 +25,6 @@ public class AccountEntity {
     @GeneratedValue
     @Type(type = "org.hibernate.type.UUIDCharType")
     private UUID id;
-
-    @Column(unique = true)
-    private UUID accessId;
 
     @CreationTimestamp
     private Instant createdTime;
@@ -54,36 +53,28 @@ public class AccountEntity {
 
     private String address;
 
-    public AccountEntity(UUID accessId, AccessRequestEntity request) {
-        this.accessId = accessId;
-        this.email = request.getEmail();
-        this.username = request.getUsername();
-        this.password = request.getPassword();
-    }
-
     public boolean update(UpdateAccountRequest request) {
         boolean updated = false;
-        if (!StringUtils.isEmpty(request.getFirstName())) {
+        if (!StringUtils.isEmpty(request.getFirstName()) && !request.getFirstName().equals(firstName)) {
             this.firstName = request.getFirstName();
             updated = true;
         }
-        if (!StringUtils.isEmpty(request.getLastName())) {
+        if (!StringUtils.isEmpty(request.getLastName()) && !request.getLastName().equals(lastName)) {
             this.lastName = request.getLastName();
             updated = true;
         }
-        if (!StringUtils.isEmpty(request.getEmail())) {
+        if (!StringUtils.isEmpty(request.getEmail()) && !request.getEmail().equals(email)) {
             this.email = request.getEmail();
             updated = true;
         }
-        if (!StringUtils.isEmpty(request.getPhoneNumber())) {
+        if (!StringUtils.isEmpty(request.getPhoneNumber()) && !request.getPhoneNumber().equals(phoneNumber)) {
             this.phoneNumber = request.getPhoneNumber();
             updated = true;
         }
-        if (!StringUtils.isEmpty(request.getAddress())) {
+        if (!StringUtils.isEmpty(request.getAddress()) && !request.getAddress().equals(address)) {
             this.address = request.getAddress();
             updated = true;
         }
         return updated;
     }
-
 }

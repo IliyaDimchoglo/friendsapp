@@ -15,11 +15,11 @@ import static com.skysoft.business.api.model.InviteStatus.*;
 public class InviteEntity extends BaseCreatedEntity{
 
     @ManyToOne
-    @JoinColumn(name = "account_id")
+    @JoinColumn(name = "from_id")
     private AccountEntity account;
 
     @ManyToOne
-    @JoinColumn(name = "friend_id")
+    @JoinColumn(name = "to_id")
     private AccountEntity friend;
 
     @Enumerated(EnumType.STRING)

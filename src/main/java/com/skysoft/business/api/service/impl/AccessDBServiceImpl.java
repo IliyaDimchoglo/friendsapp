@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -29,8 +30,13 @@ public class AccessDBServiceImpl implements AccessDBService {
     }
 
     @Override
-    public Optional<AccessRequestEntity> findByConfirmationCode(String confirmationCode) {
-        return accessRepository.findFirstByConfirmationCode(confirmationCode);
+    public Optional<AccessRequestEntity> findOptionalByIdAndConfirmationCode(UUID accessId, UUID confirmationCode) {
+        return accessRepository.findFirstByIdAndConfirmationCode(accessId, confirmationCode);
+    }
+
+    @Override
+    public boolean existConfirmedEmailAndUsername(String email, String username) {
+        return accessRepository.existsByEmailAndUsernameAndConfirmedTrue(email, username);
     }
 
     @Override

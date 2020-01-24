@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.Objects;
+import java.util.UUID;
 
 @Data
 @Entity
@@ -22,8 +23,7 @@ public class AccessRequestEntity  extends BaseUpdatedEntity{
     @Column (nullable = false)
     private String password;
 
-    @Column(unique = true)
-    private String confirmationCode;
+    private UUID confirmationCode;
 
     private boolean confirmed;
 
@@ -34,4 +34,12 @@ public class AccessRequestEntity  extends BaseUpdatedEntity{
     public boolean isConfirmed() {
         return Objects.nonNull(account);
     }
+
+    public AccountEntity toAccountEntity(){
+        return AccountEntity.builder()
+                .email(email)
+                .username(username)
+                .build();
+    }
+    // TODO: 23.01.20 toAccountEntity()
 }

@@ -8,9 +8,10 @@ import java.util.UUID;
 
 public interface AccessRepository extends JpaRepository<AccessRequestEntity, UUID> {
 
-    Optional<AccessRequestEntity> findFirstByConfirmationCode(String confirmationCode);
+    Optional<AccessRequestEntity> findFirstByIdAndConfirmationCode(UUID id, UUID confirmationCode);
 
     Optional<AccessRequestEntity> findFirstByUsername(String username);
 
+    boolean existsByEmailAndUsernameAndConfirmedTrue(String email,String username);
 
 }

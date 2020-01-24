@@ -21,29 +21,33 @@ public class AccountController {
 
     private final AccountService accountService;
 
-
     @GetMapping
-    public ResponseEntity<GetAllAccountsResponse> getAllAccounts() {
-        return accountService.getAllAccounts();
+    public ResponseEntity<GetAllAccountsResponse> getAllAccounts(CurrentUser currentUser) {
+        GetAllAccountsResponse allAccounts = accountService.getAllAccounts(currentUser);
+        return ResponseEntity.ok(allAccounts);
     }
 
     @GetMapping("/info")
     public ResponseEntity<AccountDetailsDto> getAccountInfo(CurrentUser currentUser) {
-        return accountService.getAccountInfo(currentUser);
+        AccountDetailsDto accountInfo = accountService.getAccountInfo(currentUser);
+        return ResponseEntity.ok(accountInfo);
     }
 
     @PatchMapping("/update")
     public ResponseEntity<Void> updateAccountInfo(@Valid @RequestBody UpdateAccountRequest updateAccountRequest, CurrentUser currentUser) {
-        return accountService.updateAccountInfo(updateAccountRequest, currentUser);
+        accountService.updateAccountInfo(updateAccountRequest, currentUser);
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/avatar")
     public ResponseEntity<Void> updateAvatar(@RequestParam(name = "avatar") MultipartFile avatar, CurrentUser user) {
-        return accountService.updateAvatar(avatar, user);
+        accountService.updateAvatar(avatar, user);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping
     public ResponseEntity<Void> getAvailabilityUser(@Valid @RequestBody AvailabilityUserRequest request) {
-        return accountService.existByUsernameAndEmail(request.getUsername(), request.getEmail());
+        accountService.existByUsernameAndEmail(request.getUsername(), request.getEmail());
+        return ResponseEntity.ok().build();
     }
 }

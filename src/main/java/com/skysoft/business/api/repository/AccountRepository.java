@@ -11,5 +11,5 @@ import java.util.UUID;
 public interface AccountRepository extends JpaRepository<AccountEntity, UUID> {
     Optional<AccountEntity> findFirstByUsername(String username);
     boolean existsByUsernameOrEmail(String username, String email);
-    List<AccountEntity> findAllByIdIn(List<UUID> ids);
+    List<AccountEntity> findAllByIdIsNotIn(List<UUID> ids);
 }

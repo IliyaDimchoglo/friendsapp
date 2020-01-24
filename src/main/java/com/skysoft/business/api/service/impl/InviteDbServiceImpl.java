@@ -31,15 +31,14 @@ public class InviteDbServiceImpl implements InviteDBService {
     }
 
     @Override
-    public Optional<InviteEntity> getOptionalByAccountUsernameAndStatus(String username, InviteStatus inviteStatus) {
-        return inviteRepository.findFirstByAccountUsernameAndInviteStatus(username, inviteStatus);
+    public Optional<InviteEntity> getOptionalByUsernameAndFriendNameAndStatus(String username, String friendName) {
+        return inviteRepository.findFirstByAccountUsernameAndFriendUsernameAndInviteStatus(username, friendName, PENDING);
     }
 
     @Override
-    public boolean existInvite(String username, String friendName) {
-        return inviteRepository.existsByAccount_UsernameAndFriend_UsernameAndInviteStatus(username, friendName, PENDING)
-                || inviteRepository.existsByAccount_UsernameAndFriend_UsernameAndInviteStatus(friendName, username, PENDING);
-
+    public boolean existPendingInvite(String username, String friendName, InviteStatus status) {
+        return inviteRepository.existsByAccount_UsernameAndFriend_UsernameAndInviteStatus(username, friendName, status)
+                || inviteRepository.existsByAccount_UsernameAndFriend_UsernameAndInviteStatus(friendName, username, status);
     }
 
     @Override

@@ -16,18 +16,18 @@ import java.util.UUID;
 
 public interface AccountService {
 
-    ResponseEntity<GetAllAccountsResponse> getAllAccounts();
+    GetAllAccountsResponse getAllAccounts(CurrentUser currentUser);
 
     AccountEntity registerNewAccount(AccessRequestEntity accessRequestEntity);
 
-    ResponseEntity<AccountDetailsDto> getAccountInfo(CurrentUser currentUser);
+    AccountDetailsDto getAccountInfo(CurrentUser currentUser);
 
-    ResponseEntity<Void> updateAccountInfo(UpdateAccountRequest request, CurrentUser currentUser);
+    void updateAccountInfo(UpdateAccountRequest request, CurrentUser currentUser);
 
     AccountEntity getAccountByUsername(String username);
 
-    ResponseEntity<Void> existByUsernameAndEmail(String firstName, String email);
+    void existByUsernameAndEmail(String firstName, String email);
 
-    ResponseEntity<Void> updateAvatar(MultipartFile avatar, CurrentUser user);
+    void updateAvatar(MultipartFile avatar, CurrentUser user);
 }
 

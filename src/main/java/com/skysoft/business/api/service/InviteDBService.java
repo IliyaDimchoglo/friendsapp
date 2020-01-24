@@ -13,13 +13,12 @@ public interface InviteDBService {
 
     List<InviteEntity> findAllInvitesByAccountUsernameAndStatus(String username, InviteStatus inviteStatus);
 
-    boolean existInvite(String username, String friendName);
+    boolean existPendingInvite(String username, String friendName, InviteStatus status);
 
-    Optional<InviteEntity> getOptionalByAccountUsernameAndStatus(String username, InviteStatus inviteStatus);
+    Optional<InviteEntity> getOptionalByUsernameAndFriendNameAndStatus(String username, String friendName);
 
-    default InviteEntity getInviteEntityByAccount_UsernameAndStatus(String username, InviteStatus inviteStatus){
-        return  getOptionalByAccountUsernameAndStatus(username, inviteStatus).orElseThrow(
-                () -> new NotFoundException("Invite not found"));
+    default InviteEntity getInviteByUsernameAndFriendNameAndStatusPending(String username, String friendName) throws NotFoundException {
+        return getOptionalByUsernameAndFriendNameAndStatus(username, friendName).orElseThrow(() -> new NotFoundException("Invite not found"));
     }
 
     void save(InviteEntity entity);

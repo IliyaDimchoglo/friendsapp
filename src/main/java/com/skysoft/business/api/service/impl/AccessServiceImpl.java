@@ -1,7 +1,7 @@
 package com.skysoft.business.api.service.impl;
 
 import com.skysoft.business.api.dto.request.AccessRequest;
-import com.skysoft.business.api.exception.NotFoundException;
+import com.skysoft.business.api.exception.BadRequestException;
 import com.skysoft.business.api.model.AccessRequestEntity;
 import com.skysoft.business.api.model.AccountEntity;
 import com.skysoft.business.api.service.AccessDBService;
@@ -11,6 +11,8 @@ import com.skysoft.business.api.service.ConfirmationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -24,17 +26,24 @@ public class AccessServiceImpl implements AccessService {
     @Override
     public void createAccessRequest(AccessRequest request) {
         log.info("[x] Account registration request: {}", request);
-        AccessRequestEntity entity = accessDBService.save(request.toEntity());
-        confirmationService.sendConfirmation(entity.getEmail(), entity.getConfirmationCode());
+        if (!isEmailAndUsernameExistAndConfirmed(request.getEmail(), request.getUsername())) {
+            AccessRequestEntity entity = accessDBService.save(request.toEntity());
+            confirmationService.sendConfirmation(entity.getEmail(), entity.getId(), entity.getConfirmationCode());
+        }else {
+            throw new BadRequestException("Email already confirmed.");
+        }
     }
 
     @Override
-    public void confirmAccess(String confirmationCode) {
-        AccessRequestEntity entity = accessDBService.findByConfirmationCode(confirmationCode)
-                .orElseThrow(() -> new NotFoundException("Confirmation Code is not valid."));
+    public void confirmAccess(UUID accessId, UUID confirmationCode) {
+        AccessRequestEntity entity = accessDBService.findByIdAndConfirmationCode(accessId, confirmationCode);
         entity.setConfirmed(true);
         AccountEntity accountEntity = accountService.registerNewAccount(entity);
         accessDBService.confirmAccessRequest(entity, accountEntity);
-        log.info("[x] Access successfully confirmed with email {}:", entity.getEmail());
+        log.info("[x] Access successfully confirmed for email: {}.", entity.getEmail());
+    }
+
+    private boolean isEmailAndUsernameExistAndConfirmed(String email, String username){
+        return accessDBService.existConfirmedEmailAndUsername(email, username);// FIXME: 23.01.20
     }
 }

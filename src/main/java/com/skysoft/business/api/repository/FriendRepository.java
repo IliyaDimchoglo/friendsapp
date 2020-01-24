@@ -14,5 +14,6 @@ public interface FriendRepository extends JpaRepository<FriendEntity, UUID> {
 
     Optional<FriendEntity> findFriendEntityByAccount_UsernameAndFriend_UsernameAndStatusOrFriend_UsernameAndAccount_UsernameAndStatus(String accountUsername, String friendName, FriendStatus status1, String friendUsername, String accountName, FriendStatus status2);
 
-    FriendEntity findFirstByFriend_Username(String username);
+    Optional<FriendEntity> findFirstByAccount_UsernameAndFriend_UsernameAndStatusOrFriend_UsernameAndAccount_UsernameAndStatus(String username, String friendName, FriendStatus status, String friendUsername, String name, FriendStatus status2);
+
 }

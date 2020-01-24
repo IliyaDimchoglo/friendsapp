@@ -9,11 +9,17 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface InviteRepository extends JpaRepository<InviteEntity, UUID> {
+
+
     List<InviteEntity> findAllByFriendUsernameAndInviteStatus(String username, InviteStatus inviteStatus);
 
     List<InviteEntity> findAllByAccountUsernameAndInviteStatus(String username, InviteStatus inviteStatus);
 
     Optional<InviteEntity> findFirstByAccountUsernameAndInviteStatus(String username, InviteStatus inviteStatus);
 
+    Optional<InviteEntity> findFirstByAccountUsernameAndFriendUsernameAndInviteStatus(
+            String username, String friendName, InviteStatus status);// TODO: 23.01.20 implement in send invite reverse params(friend -> account)
+
     boolean existsByAccount_UsernameAndFriend_UsernameAndInviteStatus(String username, String friendName, InviteStatus inviteStatus);
 }
+

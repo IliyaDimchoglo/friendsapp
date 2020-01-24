@@ -20,7 +20,8 @@ public class InviteController {
 
     @GetMapping
     public ResponseEntity<GetAllInvitationsResponse> getAllInvitations(CurrentUser currentUser) {
-        return inviteService.getAllInvitations(currentUser);
+        GetAllInvitationsResponse allInvitations = inviteService.getAllInvitations(currentUser);
+        return ResponseEntity.ok(allInvitations);
     }
 
     @PostMapping("/send")
@@ -31,11 +32,13 @@ public class InviteController {
 
     @PostMapping("/accept")
     public ResponseEntity<Void> acceptInvitation(@Valid @RequestBody InvitationRequest request, CurrentUser currentUser) {
-        return inviteService.acceptInvitation(request, currentUser);
+        inviteService.acceptInvitation(request, currentUser);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/reject")
     public ResponseEntity<Void> rejectInvitation(@Valid @RequestBody InvitationRequest request, CurrentUser currentUser) {
-        return inviteService.rejectInvitation(request, currentUser);
+        inviteService.rejectInvitation(request, currentUser);
+        return ResponseEntity.ok().build();
     }
 }

@@ -19,11 +19,13 @@ public class FriendController {
 
     @GetMapping("/all")
     public ResponseEntity<GetAllFriendsResponse> getAllFriends(CurrentUser currentUser) {
-        return friendService.getAllFriends(currentUser);
+        GetAllFriendsResponse allFriends = friendService.getAllFriends(currentUser.getUsername());
+        return ResponseEntity.ok(allFriends);
     }
 
     @DeleteMapping("delete")
     public ResponseEntity<Void> deleteFriend(@Valid @RequestBody DeleteFriendRequest request, CurrentUser currentUser) {
-        return friendService.deleteFriend(request, currentUser);
+        friendService.deleteFriend(request, currentUser);
+        return ResponseEntity.ok().build();
     }
 }

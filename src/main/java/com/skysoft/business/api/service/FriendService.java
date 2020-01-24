@@ -12,17 +12,8 @@ import java.util.Optional;
 
 public interface FriendService {
 
-    ResponseEntity<GetAllFriendsResponse> getAllFriends(CurrentUser currentUser);
+    GetAllFriendsResponse getAllFriends(String currentUser);
 
-    ResponseEntity<Void> deleteFriend(DeleteFriendRequest request, CurrentUser currentUser);
+    void deleteFriend(DeleteFriendRequest request, CurrentUser currentUser);
 
-    Optional<FriendEntity> getOptionalFriendEntityByAccountUsernameAndStatusAndFriendUsernameAndStatus(String accountUsername, String friendName, FriendStatus status1, String friendUsername, String accountName, FriendStatus status2);
-
-    default FriendEntity getFriendEntityByAccountUsernameAndStatusAndFriendUsernameAndStatus(String accountUsername, String friendName, FriendStatus status1, String friendUsername, String accountName, FriendStatus status2) {
-        return getOptionalFriendEntityByAccountUsernameAndStatusAndFriendUsernameAndStatus(accountUsername, friendName, status1, friendUsername, accountName, status2).orElseThrow(() -> new NotFoundException("Friend not found"));
-    }
-
-    void save(FriendEntity friendEntity);
-
-    FriendEntity findByUsername(String username);
 }

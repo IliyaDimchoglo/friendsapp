@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.util.Random;
 import java.util.UUID;
 
 @Data
@@ -36,7 +34,7 @@ public class AccessRequest {
                 .username(username)
                 .email(email)
                 .password(password)
-                .confirmationCode(UUID.randomUUID().toString())
+                .confirmationCode(UUID.randomUUID())
                 .build();
     }
 }
