@@ -41,4 +41,10 @@ public class InviteController {
         inviteService.rejectInvitation(request, currentUser);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/cancel")
+    public ResponseEntity<Void> cancelInvite(@Valid @RequestBody InvitationRequest request, CurrentUser currentUser) {
+        inviteService.cancelInvite(request, currentUser);
+        return ResponseEntity.ok().build();
+    }
 }

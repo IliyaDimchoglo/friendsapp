@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,7 +45,7 @@ public class InviteServiceImpl implements InviteService {
         String friendName = request.getValidUsername(username);
         boolean pendingInvite = inviteDBService.existPendingInvite(username, friendName, PENDING);
         if (!pendingInvite && isFriends(username, friendName)) {
-            inviteDBService.save(getInviteByAccountAndFriend(username, friendName));
+            inviteDBService.save(createInviteByAccountAndFriend(username, friendName));
             log.info("[x] Successful send invite to account: {}, for current user: {}", friendName, username);
         } else {
             log.warn("[x] Bad request account: {}, for invite: {}", username, friendName);
@@ -56,7 +57,7 @@ public class InviteServiceImpl implements InviteService {
     public void acceptInvitation(InvitationRequest request, CurrentUser currentUser) {
         String username = currentUser.getUsername();
         String friendName = request.getUsername();
-        InviteEntity inviteFriendEntity = inviteDBService.getInviteByUsernameAndFriendNameAndStatusPending(friendName, username);// FIXME: 23.01.20 private method get friend
+        InviteEntity inviteFriendEntity = getPendingInviteByAccountAndFriend(friendName, username);// FIXME: 23.01.20 private method get friend
         addFriend(username, friendName, inviteFriendEntity);
         log.info("[x] New Friend: {}, successful added for account: {}.", friendName, username);
     }
@@ -65,10 +66,25 @@ public class InviteServiceImpl implements InviteService {
     public void rejectInvitation(InvitationRequest request, CurrentUser currentUser) {
         String username = currentUser.getUsername();
         String friendName = request.getUsername();
-        InviteEntity friendInviteEntity = inviteDBService.getInviteByUsernameAndFriendNameAndStatusPending(friendName, username);
+        InviteEntity friendInviteEntity = getPendingInviteByAccountAndFriend(friendName, username);
         friendInviteEntity.setInviteStatus(REJECT);
         inviteDBService.save(friendInviteEntity);
         log.info("[x] Invite: {}, successful reject for account: {}.", friendName, username);
+    }
+
+    @Override
+    @Transactional
+    public void cancelInvite(InvitationRequest request, CurrentUser currentUser) {
+        String username = currentUser.getUsername();
+        String friendName = request.getUsername();
+        try {
+            InviteEntity inviteEntity = getPendingInviteByAccountAndFriend(username, friendName);
+            inviteEntity.setInviteStatus(CANCEL);
+            log.info("Cancel invite to: {}, from user: {}.", friendName, username);
+        } catch (Exception e){
+            log.warn("[x] Bad request for cancel invite from user: {}, to: {}", username, friendName);
+            throw new BadRequestException("Bad request for cancel invite.");
+        }
     }
 
     @Override
@@ -116,7 +132,11 @@ public class InviteServiceImpl implements InviteService {
         return OutgoingInvitesDto.of(namesList);
     }
 
-    private InviteEntity getInviteByAccountAndFriend(String username, String friend) {
+    private InviteEntity getPendingInviteByAccountAndFriend(String friendName, String username) {
+        return inviteDBService.getInviteByUsernameAndFriendNameAndStatusPending(friendName, username);
+    }
+
+    private InviteEntity createInviteByAccountAndFriend(String username, String friend) {
         AccountEntity accountEntity = accountService.getAccountByUsername(username);
         AccountEntity friendEntity = accountService.getAccountByUsername(friend);
         return InviteEntity.of(accountEntity, friendEntity, PENDING);

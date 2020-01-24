@@ -1,5 +1,5 @@
 package com.skysoft.business.api.model;
 
 public enum InviteStatus {
-     PENDING, ACCEPT, REJECT
+     PENDING, ACCEPT, REJECT, CANCEL
 }

@@ -14,4 +14,6 @@ public interface InviteService {
     void sendInvite(AddAccountToFriendsRequest request, CurrentUser currentUser);
 
     void rejectInvitation(InvitationRequest request, CurrentUser currentUser);
+
+    void cancelInvite(InvitationRequest request, CurrentUser currentUser);
 }
