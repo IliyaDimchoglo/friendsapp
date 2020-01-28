@@ -1,6 +1,5 @@
 package com.skysoft.service;
 
-import com.skysoft.config.security.jwt.CurrentUser;
 import com.skysoft.dto.AccountDetailsDto;
 import com.skysoft.dto.request.UpdateAccountRequest;
 import com.skysoft.dto.response.GetAllAccountsResponse;

@@ -3,27 +3,28 @@ package com.skysoft.service;
 import com.skysoft.exception.NotFoundException;
 import com.skysoft.model.FriendEntity;
 import com.skysoft.model.FriendStatus;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface FriendDBService {
 
-    Optional<FriendEntity> getOptionalFriendEntityByAccountUsernameAndStatusOrFriendUsernameAndStatus(String accountUsername, String friendName, FriendStatus status);
+    Optional<FriendEntity> findActiveByUsernameAndFriendName(String accountUsername, String friendName);
 
-    default FriendEntity getFriendEntityByAccountUsernameAndStatusOrFriendUsernameAndStatus(String accountUsername, String friendName, FriendStatus status) {
-        return getOptionalFriendEntityByAccountUsernameAndStatusOrFriendUsernameAndStatus(accountUsername, friendName, status).orElseThrow(() -> new NotFoundException("Friend not found"));
+    default FriendEntity getActiveByUsernameAndFriendName(String accountUsername, String friendName) {
+        return findActiveByUsernameAndFriendName(accountUsername, friendName).orElseThrow(() -> new NotFoundException("Friend not found"));
     }
 
-    List<FriendEntity> getAllFriendsByAccountUsernameAndStatus(String currentUser, FriendStatus status);
+    List<FriendEntity> getAllFriendsByUsernameAndStatus(String currentUser, FriendStatus status);
 
     void save(FriendEntity friendEntity);
 
-    Optional<FriendEntity> findOptionalByUsernameAndFriendName(String username, String friendName);
+    boolean existByUsernameAndFriendNameAndStatusActive(String username, String friendName);
 
-    default FriendEntity findByUsernameAndFriendNameAndStatus(String username, String friendName){
-        return findOptionalByUsernameAndFriendName(username, friendName).orElseThrow(() -> new NotFoundException("Friend not found"));
-
-    }
+    Optional<FriendEntity> findByUsernameAndFriendName(String username, String friendName);
 
 }
+/*
+@Query(value = "select l.id from labs l where l.group_id in " +
+        "(select ur.group_id from user_roles ur where ur.user_id = :userId and ur.role = 'ROLE_USER' OR ur.role = 'ROLE_GROUP_ADMIN')", nativeQuery = true)*/

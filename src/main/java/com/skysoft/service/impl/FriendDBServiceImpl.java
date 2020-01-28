@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static com.skysoft.model.FriendStatus.*;
+
 @Service
 @RequiredArgsConstructor
 public class FriendDBServiceImpl implements FriendDBService {
@@ -17,13 +19,14 @@ public class FriendDBServiceImpl implements FriendDBService {
     private final FriendRepository friendRepository;
 
     @Override
-    public Optional<FriendEntity> getOptionalFriendEntityByAccountUsernameAndStatusOrFriendUsernameAndStatus(String accountUsername, String friendName, FriendStatus status) {
-        return friendRepository.findFriendEntityByAccountUsernameAndFriendUsernameAndStatusOrFriendUsernameAndAccountUsernameAndStatus(accountUsername, friendName, status, accountUsername, friendName, status);
+    public Optional<FriendEntity> findActiveByUsernameAndFriendName(String accountUsername, String friendName) {
+        return friendRepository.findFriendEntityByAccount1_UsernameAndAccount2_UsernameAndStatusOrAccount2_UsernameAndAccount1_UsernameAndStatus(
+                accountUsername, friendName, ACTIVE, accountUsername, friendName, ACTIVE);
     }
 
     @Override
-    public List<FriendEntity> getAllFriendsByAccountUsernameAndStatus(String currentUser, FriendStatus status) {
-        return friendRepository.findFriendEntitiesByAccount_UsernameAndStatusOrFriend_UsernameAndStatus(currentUser, status, currentUser, status);
+    public List<FriendEntity> getAllFriendsByUsernameAndStatus(String currentUser, FriendStatus status) {
+        return friendRepository.findFriendEntitiesByAccount1_UsernameAndStatusOrAccount2_UsernameAndStatus(currentUser, status, currentUser, status);
     }
 
     @Override
@@ -32,7 +35,13 @@ public class FriendDBServiceImpl implements FriendDBService {
     }
 
     @Override
-    public Optional<FriendEntity> findOptionalByUsernameAndFriendName(String username, String friendName) {
-        return friendRepository.findFirstByAccount_UsernameAndFriend_UsernameOrFriend_UsernameAndAccount_Username(username, friendName, username, friendName);
+    public boolean existByUsernameAndFriendNameAndStatusActive(String username, String friendName) {
+        return friendRepository.existsByAccount1_UsernameAndAccount2_UsernameAndStatusOrAccount2_UsernameAndAccount1_UsernameAndStatus(
+                username, friendName, ACTIVE, username, friendName, ACTIVE);
+    }
+
+    @Override
+    public Optional<FriendEntity> findByUsernameAndFriendName(String username, String friendName) {
+        return friendRepository.findFriendEntityByAccount1_UsernameAndAccount2_UsernameOrAccount2_UsernameAndAccount1_Username(username, friendName, username, friendName);
     }
 }

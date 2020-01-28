@@ -24,7 +24,7 @@ public class ConfirmationServiceImpl implements ConfirmationService {
     @Async
     @Override
     public void sendConfirmation(String email, UUID id, UUID confirmationCode) {
-        log.info("[x] Ready to send confirmation to: {}, code: {}", email, confirmationCode);
+        log.info("[x] Ready send confirmation : {}, code: {}", email, confirmationCode);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
         message.setText(text + "\n" + "http://localhost:8888/api/access/confirm?id=" + id +

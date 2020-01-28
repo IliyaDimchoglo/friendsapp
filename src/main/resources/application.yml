@@ -6,7 +6,7 @@ spring:
     port: 587
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
-    message: Thank you for registering. Please click on the below link to activate your account.
+    message: Thank you for registering. Please click on the below link account2 activate your account1.
     default-encoding: UTF-8
     properties:
       mail:
@@ -25,7 +25,7 @@ spring:
     url: ${DATABASE_URL}
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQL94Dialect
-    show-sql: false
+    show-sql: true
     database: postgresql
     generate-ddl: true
     open-in-view: true

@@ -10,10 +10,12 @@ import java.util.UUID;
 
 public interface FriendRepository extends JpaRepository<FriendEntity, UUID> {
 
-    List<FriendEntity> findFriendEntitiesByAccount_UsernameAndStatusOrFriend_UsernameAndStatus(String username, FriendStatus accountStatus, String friendName, FriendStatus status);
 
-    Optional<FriendEntity> findFriendEntityByAccountUsernameAndFriendUsernameAndStatusOrFriendUsernameAndAccountUsernameAndStatus(String accountUsername, String friendName, FriendStatus status1, String friendUsername, String accountName, FriendStatus status2);
+    List<FriendEntity> findFriendEntitiesByAccount1_UsernameAndStatusOrAccount2_UsernameAndStatus(String username, FriendStatus accountStatus, String friendName, FriendStatus status);
 
-    Optional<FriendEntity> findFirstByAccount_UsernameAndFriend_UsernameOrFriend_UsernameAndAccount_Username(String username, String friendName, String friendUsername, String name);
+    Optional<FriendEntity> findFriendEntityByAccount1_UsernameAndAccount2_UsernameAndStatusOrAccount2_UsernameAndAccount1_UsernameAndStatus(String accountUsername, String friendName, FriendStatus status1, String friendUsername, String accountName, FriendStatus status2);
 
+    boolean existsByAccount1_UsernameAndAccount2_UsernameAndStatusOrAccount2_UsernameAndAccount1_UsernameAndStatus(String username, String friendName, FriendStatus status, String friendUsername, String name, FriendStatus status2);
+
+    Optional<FriendEntity> findFriendEntityByAccount1_UsernameAndAccount2_UsernameOrAccount2_UsernameAndAccount1_Username(String username, String friendName, String name, String friendUsername);
 }

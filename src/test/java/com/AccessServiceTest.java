@@ -2,7 +2,6 @@ package com;
 
 import com.skysoft.dto.request.AccessRequest;
 import com.skysoft.exception.BadRequestException;
-import com.skysoft.exception.NotFoundException;
 import com.skysoft.model.AccessRequestEntity;
 import com.skysoft.model.AccountEntity;
 import com.skysoft.service.AccessDBService;
@@ -11,17 +10,14 @@ import com.skysoft.service.ConfirmationService;
 import com.skysoft.service.impl.AccessServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.gen5.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.UUID;
-
 import static java.util.UUID.randomUUID;
-import static org.junit.gen5.api.Assertions.*;
+import static org.junit.gen5.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)

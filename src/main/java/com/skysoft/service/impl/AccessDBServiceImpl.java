@@ -21,7 +21,6 @@ public class AccessDBServiceImpl implements AccessDBService {
     @Override
     public AccessRequestEntity save(AccessRequestEntity entity) {
         return accessRepository.save(entity);
-
     }
 
     @Override

@@ -1,9 +1,6 @@
 package com.skysoft.service.impl;
 
-import com.skysoft.config.security.jwt.CurrentUser;
 import com.skysoft.dto.AccountDto;
-import com.skysoft.dto.IngoingInvitesDto;
-import com.skysoft.dto.OutgoingInvitesDto;
 import com.skysoft.dto.request.AddAccountToFriendsRequest;
 import com.skysoft.dto.request.InvitationRequest;
 import com.skysoft.dto.response.GetAllInvitationsResponse;
@@ -40,24 +37,27 @@ public class InviteServiceImpl implements InviteService {
     private final ModelMapper mapper;
 
     @Override
+    @Transactional
     public void sendInvite(AddAccountToFriendsRequest request, String currentUser) {
         String friendName = request.getValidUsername(currentUser);
-        boolean pendingInvite = inviteDBService.existPendingInvite(currentUser, friendName, PENDING);
-        if (!pendingInvite && !isFriends(currentUser, friendName)) {
+        boolean pendingInvite = inviteDBService.existPendingInvite(currentUser, friendName);
+        boolean isFriends = friendDBService.existByUsernameAndFriendNameAndStatusActive(friendName, currentUser);
+        if (!pendingInvite && !isFriends) {
             inviteDBService.save(createInviteByAccountAndFriend(currentUser, friendName));
-            log.info("[x] Successful send invite to account: {}, for current user: {}", friendName, currentUser);
+            log.info("[x] Successful send invite account2 account1: {}, for current user: {}", friendName, currentUser);
         } else {
-            log.warn("[x] Bad request account: {}, for invite: {}", currentUser, friendName);
+            log.warn("[x] Bad request account1: {}, for invite: {}", currentUser, friendName);
             throw new BadRequestException("Bad request for invite.");
         }
     }
 
     @Override
+    @Transactional
     public void acceptInvitation(InvitationRequest request, String currentUser) {
         String friendName = request.getUsername();
-        InviteEntity inviteFriendEntity = getPendingInviteByAccountAndFriend(friendName, currentUser);// FIXME: 23.01.20 private method get friend
+        InviteEntity inviteFriendEntity = getPendingInviteByAccountAndFriend(friendName, currentUser);
         addFriend(currentUser, friendName, inviteFriendEntity);
-        log.info("[x] New Friend: {}, successful added for account: {}.", friendName, currentUser);
+        log.info("[x] New Friend: {}, successful added for account1: {}.", friendName, currentUser);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class InviteServiceImpl implements InviteService {
         String friendName = request.getUsername();
         InviteEntity friendInviteEntity = getPendingInviteByAccountAndFriend(friendName, currentUser);
         friendInviteEntity.setInviteStatus(REJECT);
-        log.info("[x] Invite: {}, successful reject for account: {}.", friendName, currentUser);
+        log.info("[x] Invite: {}, successful reject for account1: {}.", friendName, currentUser);
     }
 
     @Override
@@ -76,74 +76,61 @@ public class InviteServiceImpl implements InviteService {
         try {
             InviteEntity inviteEntity = getPendingInviteByAccountAndFriend(currentUser, friendName);
             inviteEntity.setInviteStatus(CANCEL);
-            log.info("Cancel invite to: {}, from user: {}.", friendName, currentUser);
+            log.info("Cancel invite account2: {}, account1 user: {}.", friendName, currentUser);
         } catch (Exception e){
-            log.warn("[x] Bad request for cancel invite from user: {}, to: {}", currentUser, friendName);
+            log.warn("[x] Bad request for cancel invite account1 user: {}, account2: {}", currentUser, friendName);
             throw new BadRequestException("Bad request for cancel invite.");
         }
     }
 
     @Override
     public GetAllInvitationsResponse getAllInvitations(String currentUser) {
-        IngoingInvitesDto ingoingInvites = getIngoingInvites(currentUser);
-        OutgoingInvitesDto outgoingInvites = getOutgoingInvites(currentUser);
+        List<AccountDto> ingoingInvites = getIngoingInvites(currentUser);
+        List<AccountDto> outgoingInvites = getOutgoingInvites(currentUser);
         log.info("[x] Get all invitations for current user: {}.", currentUser);
         return new GetAllInvitationsResponse(ingoingInvites, outgoingInvites);
     }
 
     private void addFriend(String username, String friendName, InviteEntity entity) throws BadRequestException {
-        Optional<FriendEntity> friend = friendDBService.findOptionalByUsernameAndFriendName(username, friendName);
+        Optional<FriendEntity> friend = friendDBService.findByUsernameAndFriendName(username, friendName);
         if (!friend.isPresent()) {
             AccountEntity account = accountService.getAccountByUsername(username);
             AccountEntity friendAccount = accountService.getAccountByUsername(friendName);
             friendDBService.save(new FriendEntity(account, friendAccount));
-            saveAcceptInviteStatus(entity);
+            entity.acceptInvite();
         } else if (friend.get().getStatus().equals(DELETED)) {
             friend.get().setStatus(ACTIVE);
-            friendDBService.save(friend.get());
         } else {
-            log.warn("[x] Failed add friend: {}, for current user: {}", friendName, username);
+            log.warn("[x] Failed add account2: {}, for current user: {}", friendName, username);
             throw new BadRequestException("Friend already added.");
         }
     }
 
-    private IngoingInvitesDto getIngoingInvites(String username) {
-        List<AccountDto> namesList = inviteDBService.findAllInvitesByFriendUsernameAndStatus(username, PENDING)
-                .stream()
-                .map(InviteEntity::getAccount)
-                .map(entity -> mapper.map(entity, AccountDto.class))
-                .collect(Collectors.toList());
-        log.info("[x] Get all ingoing Invitations: {}, for current user: {}.", namesList.toString(), username);
-        return IngoingInvitesDto.of(namesList);
+    private List<AccountDto> getIngoingInvites(String username) {
+            List<AccountDto> namesList = inviteDBService.findAllInvitesByFriendUsernameAndStatus(username, PENDING)
+                    .stream()
+                    .map(entity -> mapper.map(entity.getAccount1(), AccountDto.class))
+                    .collect(Collectors.toList());
+            log.info("[x] Get all ingoing Invitations: {}, for current user: {}.", namesList.toString(), username);
+            return namesList;
     }
 
-    private OutgoingInvitesDto getOutgoingInvites(String username) {
+    private List<AccountDto> getOutgoingInvites(String username) {
         List<AccountDto> namesList = inviteDBService.findAllInvitesByAccountUsernameAndStatus(username, PENDING)
                 .stream()
-                .map(InviteEntity::getFriend)
-                .map(entity -> mapper.map(entity, AccountDto.class))
+                .map(entity -> mapper.map(entity.getAccount2(), AccountDto.class))
                 .collect(Collectors.toList());
         log.info("[x] Get all outgoing Invitations: {}, for current user: {}.", namesList.toString(), username);
-        return OutgoingInvitesDto.of(namesList);
+        return namesList;
     }
 
     private InviteEntity getPendingInviteByAccountAndFriend(String friendName, String username) {
-        return inviteDBService.getInviteByUsernameAndFriendNameAndStatusPending(friendName, username);
+        return inviteDBService.getInviteByUsernameAndFriendNameInStatusPending(friendName, username);
     }
 
     private InviteEntity createInviteByAccountAndFriend(String username, String friend) {
         AccountEntity accountEntity = accountService.getAccountByUsername(username);
         AccountEntity friendEntity = accountService.getAccountByUsername(friend);
         return InviteEntity.of(accountEntity, friendEntity, PENDING);
-    }
-
-    private void saveAcceptInviteStatus(InviteEntity entity) {
-        entity.setInviteStatus(ACCEPT);
-        inviteDBService.save(entity);
-    }
-
-    private boolean isFriends(String username, String friendName) {
-        Optional<FriendEntity> friends = friendDBService.findOptionalByUsernameAndFriendName(friendName, username);
-        return friends.isPresent() && friends.get().getStatus().equals(ACTIVE);
     }
 }

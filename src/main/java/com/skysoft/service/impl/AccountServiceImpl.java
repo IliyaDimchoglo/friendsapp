@@ -1,6 +1,5 @@
 package com.skysoft.service.impl;
 
-import com.skysoft.config.security.jwt.CurrentUser;
 import com.skysoft.dto.AccountDetailsDto;
 import com.skysoft.dto.AccountDto;
 import com.skysoft.dto.PersonalDetails;
@@ -11,7 +10,6 @@ import com.skysoft.exception.NotFoundException;
 import com.skysoft.exception.RegistrationException;
 import com.skysoft.model.AccessRequestEntity;
 import com.skysoft.model.AccountEntity;
-import com.skysoft.model.FriendEntity;
 import com.skysoft.repository.AccountRepository;
 import com.skysoft.service.AccountService;
 import com.skysoft.service.FriendDBService;
@@ -45,10 +43,10 @@ public class AccountServiceImpl implements AccountService {
     private String contentType;
 
     @Override
-    public GetAllAccountsResponse getAllAccounts(String currentUser) {// FIXME: 23.01.20 Get all users with marked as invited and without friends
-        List<UUID> friendAccountsList = getFriendIdsList(currentUser);
+    public GetAllAccountsResponse getAllAccounts(String currentUser) {
+        List<UUID> friendAccountsList = getFriendIdsList(currentUser);// FIXME: 28.01.20 Query
         List<AccountDto> accountDtoList = getAccountListWithoutFriendStatus(currentUser, friendAccountsList);
-        log.info("[x] Get All accounts without friend status: {}", accountDtoList.toString());
+        log.info("[x] Get All accounts without account2 status: {}", accountDtoList.toString());
         return GetAllAccountsResponse.of(accountDtoList);
     }
 
@@ -79,9 +77,9 @@ public class AccountServiceImpl implements AccountService {
         AccountEntity accountEntity = getAccountByUsername(currentUser);
         boolean updated = accountEntity.update(request);
         if (updated) {
-            log.info("[x] Successfully updated account: {}, for user with name: {}", accountEntity.toString(), accountEntity.getUsername());
+            log.info("[x] Successfully updated account1: {}, for user with name: {}", accountEntity.toString(), accountEntity.getUsername());
         } else {
-            log.warn("[x] Unable to update account info for current user: {}.", currentUser);
+            log.warn("[x] Unable account2 update account1 info for current user: {}.", currentUser);
             throw new BadRequestException("Bad request for update.");
         }
     }
@@ -115,12 +113,6 @@ public class AccountServiceImpl implements AccountService {
         return accountRepository.findFirstByUsername(username).orElseThrow(() -> new NotFoundException("User not found."));
     }
 
-    private UUID getFriendAccountId(FriendEntity entity, String username) {
-        if (entity.getFriend().getUsername().equals(username)) {
-            return entity.getAccount().getId();
-        } else return entity.getFriend().getId();
-    }
-
     private List<AccountDto> getAccountListWithoutFriendStatus(String username, List<UUID> friendAccountsList) {
         List<AccountDto> listAccounts = accountRepository.findAllByIdIsNotIn(friendAccountsList)
                 .stream()
@@ -138,9 +130,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private List<UUID> getFriendIdsList(String username) {
-        return friendDBService.getAllFriendsByAccountUsernameAndStatus(username, ACTIVE)
+        return friendDBService.getAllFriendsByUsernameAndStatus(username, ACTIVE)
                 .stream()
-                .map(e -> getFriendAccountId(e, username))
+                .map(e -> e.getMyFriend(username).getId())
                 .collect(Collectors.toList());
     }
 }

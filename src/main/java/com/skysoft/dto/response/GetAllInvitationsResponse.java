@@ -2,11 +2,12 @@ package com.skysoft.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.skysoft.dto.IngoingInvitesDto;
-import com.skysoft.dto.OutgoingInvitesDto;
+import com.skysoft.dto.AccountDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -15,8 +16,9 @@ import lombok.NoArgsConstructor;
 public class GetAllInvitationsResponse {
 
     @JsonProperty("incoming_invites")
-    private IngoingInvitesDto incomingInvites;
+    private List<AccountDto> incomingInvitesList;
+
 
     @JsonProperty("outgoing_invites")
-    private OutgoingInvitesDto outgoingInvites;
+    private List<AccountDto> outgoingInvitesList;
 }

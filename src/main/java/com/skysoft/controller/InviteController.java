@@ -28,7 +28,7 @@ public class InviteController {
     @PostMapping("/send")
     public ResponseEntity<Void> sendInvite(@Valid @RequestBody AddAccountToFriendsRequest request, CurrentUser currentUser) {
         String user = currentUser.getUsername();
-        inviteService.sendInvite(request, user);
+        inviteService.sendInvite(request, user);// FIXME: 28.01.20 validate here
         return ResponseEntity.ok().build();
     }
 

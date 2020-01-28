@@ -44,6 +44,6 @@ public class AccessServiceImpl implements AccessService {
     }
 
     private boolean isEmailAndUsernameExistAndConfirmed(String email, String username){
-        return accessDBService.existConfirmedEmailAndUsername(email, username);// FIXME: 23.01.20
+        return accessDBService.existConfirmedEmailAndUsername(email, username);
     }
 }

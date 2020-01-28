@@ -44,5 +44,4 @@ public class AccessRequestEntity  extends BaseUpdatedEntity {
                 .username(username)
                 .build();
     }
-    // TODO: 23.01.20 toAccountEntity()
 }

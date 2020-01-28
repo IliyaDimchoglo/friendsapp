@@ -15,24 +15,32 @@ import javax.persistence.*;
 public class FriendEntity extends BaseUpdatedEntity {
 
     @ManyToOne
-    @JoinColumn(name = "account_id")
-    private AccountEntity account;
+    @JoinColumn(name = "account_1_id")
+    private AccountEntity account1;// FIXME: 28.01.20
 
     @ManyToOne
-    @JoinColumn(name = "friend_id")
-    private AccountEntity friend;
+    @JoinColumn(name = "account_2_id")
+    private AccountEntity account2;// FIXME: 28.01.20
 
     @Enumerated(EnumType.STRING)
     private FriendStatus status;
 
     public FriendEntity(AccountEntity account, AccountEntity friendAccount) {
         status = FriendStatus.ACTIVE;
-        this.friend = friendAccount;
-        this.account = account;
+        this.account2 = friendAccount;
+        this.account1 = account;
     }
 
     public void delete() {
         status = FriendStatus.DELETED;
+    }
+
+    public AccountEntity getMyFriend(String username){
+        if(account1.getUsername().equals(username)){
+            return account2;
+        }else {
+            return account1;
+        }
     }
 
 }
