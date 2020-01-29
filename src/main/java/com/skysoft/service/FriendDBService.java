@@ -25,6 +25,3 @@ public interface FriendDBService {
     Optional<FriendEntity> findByUsernameAndFriendName(String username, String friendName);
 
 }
-/*
-@Query(value = "select l.id from labs l where l.group_id in " +
-        "(select ur.group_id from user_roles ur where ur.user_id = :userId and ur.role = 'ROLE_USER' OR ur.role = 'ROLE_GROUP_ADMIN')", nativeQuery = true)*/

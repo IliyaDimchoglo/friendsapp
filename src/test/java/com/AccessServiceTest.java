@@ -74,13 +74,11 @@ public class AccessServiceTest {
         AccountEntity accountEntity = entity.toAccountEntity();
         when(accessDBService.findByIdAndConfirmationCode(any(), any())).thenReturn(entity);
         when(accountService.registerNewAccount(any())).thenReturn(accountEntity);
-        doNothing().when(accessDBService).confirmAccessRequest(entity, accountEntity);
 
         accessService.confirmAccess(randomUUID(), randomUUID());
 
         verify(accessDBService, times(1)).findByIdAndConfirmationCode(any(), any());
         verify(accountService, times(1)).registerNewAccount(any());
-        verify(accessDBService, times(1)).confirmAccessRequest(entity, accountEntity);
     }
 
     @Test

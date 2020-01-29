@@ -89,9 +89,9 @@ public class AccountServiceImpl implements AccountService {
         AccountEntity accountEntity = accountDBService.getByUsername(username);
         boolean updated = accountEntity.update(request);
         if (updated) {
-            log.info("[x] Successfully updated account1: {}, for user with name: {}", accountEntity.toString(), accountEntity.getUsername());
+            log.info("[x] Successfully updated account: {}, for user with name: {}", accountEntity.toString(), accountEntity.getUsername());
         } else {
-            log.warn("[x] Unable account2 update account1 info for current user: {}.", username);
+            log.warn("[x] Unable to update account info for current user: {}.", username);
             throw new BadRequestException("Bad request for update.");
         }
     }

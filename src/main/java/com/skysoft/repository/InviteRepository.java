@@ -10,12 +10,9 @@ import java.util.UUID;
 
 public interface InviteRepository extends JpaRepository<InviteEntity, UUID> {
 
-
     List<InviteEntity> findAllByAccount2_UsernameAndInviteStatus(String username, InviteStatus inviteStatus);
 
     List<InviteEntity> findAllByAccount1_UsernameAndInviteStatus(String username, InviteStatus inviteStatus);
-
-    Optional<InviteEntity> findFirstByAccount1_UsernameAndInviteStatus(String username, InviteStatus inviteStatus);
 
     Optional<InviteEntity> findFirstByAccount1_UsernameAndAccount2_UsernameAndInviteStatus(
             String username, String friendName, InviteStatus status);

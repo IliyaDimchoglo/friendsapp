@@ -41,7 +41,7 @@ public class InviteServiceImpl implements InviteService {
         boolean isFriends = friendDBService.existByUsernameAndFriendNameAndStatusActive(friendName, username);
         if (!pendingInvite && !isFriends) {
             createAndSaveInviteByUserAndFriend(username, friendName);
-            log.info("[x] Successful send invite account2 account1: {}, for current user: {}", friendName, username);
+            log.info("[x] Successful send invite to friend: {}, for current user: {}", friendName, username);
         } else {
             log.warn("[x] Bad request user: {}, for invite: {}", username, friendName);
             throw new BadRequestException("Bad request for invite.");
