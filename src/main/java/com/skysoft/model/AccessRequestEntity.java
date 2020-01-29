@@ -44,4 +44,7 @@ public class AccessRequestEntity  extends BaseUpdatedEntity {
                 .username(username)
                 .build();
     }
+    public void confirm(){
+        confirmed = true;
+    }
 }

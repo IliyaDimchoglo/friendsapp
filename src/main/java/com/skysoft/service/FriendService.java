@@ -1,12 +1,11 @@
 package com.skysoft.service;
 
-import com.skysoft.dto.request.DeleteFriendRequest;
 import com.skysoft.dto.response.GetAllFriendsResponse;
 
 public interface FriendService {
 
-    GetAllFriendsResponse getAllFriends(String currentUser);
+    GetAllFriendsResponse getAllFriends(String username);
 
-    void deleteFriend(DeleteFriendRequest request, String currentUser);
+    void deleteFriend(String friendName, String username);
 
 }

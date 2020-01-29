@@ -150,13 +150,13 @@ public class InviteServiceTest {
 
     @Test
     public void getAllInvitationsTest() {
-        when(inviteDBService.findAllInvitesByAccountUsernameAndStatus(username, PENDING)).thenReturn(Collections.singletonList(new InviteEntity()));
-        when(inviteDBService.findAllInvitesByFriendUsernameAndStatus(username, PENDING)).thenReturn(Collections.singletonList(new InviteEntity()));
+        when(inviteDBService.getPendingInvitesByFriendName(username, PENDING)).thenReturn(Collections.singletonList(new InviteEntity()));
+        when(inviteDBService.getAllInvitesUsernameAndStatus(username, PENDING)).thenReturn(Collections.singletonList(new InviteEntity()));
 
         inviteService.getAllInvitations(username);
 
-        verify(inviteDBService, times(1)).findAllInvitesByAccountUsernameAndStatus(username, PENDING);
-        verify(inviteDBService, times(1)).findAllInvitesByFriendUsernameAndStatus(username, PENDING);
+        verify(inviteDBService, times(1)).getPendingInvitesByFriendName(username, PENDING);
+        verify(inviteDBService, times(1)).getAllInvitesUsernameAndStatus(username, PENDING);
         verify(inviteService, times(1)).getAllInvitations(username);
     }
 }

@@ -6,11 +6,9 @@ import com.skysoft.dto.PersonalDetails;
 import com.skysoft.dto.request.UpdateAccountRequest;
 import com.skysoft.dto.response.GetAllAccountsResponse;
 import com.skysoft.exception.BadRequestException;
-import com.skysoft.exception.NotFoundException;
-import com.skysoft.exception.RegistrationException;
 import com.skysoft.model.AccessRequestEntity;
 import com.skysoft.model.AccountEntity;
-import com.skysoft.repository.AccountRepository;
+import com.skysoft.service.AccountDBService;
 import com.skysoft.service.AccountService;
 import com.skysoft.service.FriendDBService;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +18,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -35,7 +33,7 @@ import static java.util.Objects.requireNonNull;
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 
-    private final AccountRepository accountRepository;
+    private final AccountDBService accountDBService;
     private final FriendDBService friendDBService;
     private final ModelMapper mapper;
 
@@ -43,10 +41,11 @@ public class AccountServiceImpl implements AccountService {
     private String contentType;
 
     @Override
-    public GetAllAccountsResponse getAllAccounts(String currentUser) {
-        List<UUID> friendAccountsList = getFriendIdsList(currentUser);// FIXME: 28.01.20 Query
-        List<AccountDto> accountDtoList = getAccountListWithoutFriendStatus(currentUser, friendAccountsList);
-        log.info("[x] Get All accounts without account2 status: {}", accountDtoList.toString());
+    @Transactional(readOnly = true)
+    public GetAllAccountsResponse getAllAccounts(String username) {
+        List<UUID> friendAccountsList = getFriendIdsList(username);
+        List<AccountDto> accountDtoList = getAccountListWithoutFriendStatus(friendAccountsList);
+        log.info("[x] Get All accounts without friend status: {}", accountDtoList.toString());
         return GetAllAccountsResponse.of(accountDtoList);
     }
 
@@ -54,7 +53,8 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public AccountEntity registerNewAccount(AccessRequestEntity request) throws BadRequestException {
         try {
-            AccountEntity accountEntity = accountRepository.save(request.toAccountEntity());
+            request.confirm();
+            AccountEntity accountEntity = accountDBService.save(request.toAccountEntity());
             log.info("[x] Account registration finished. Account id: {}.", accountEntity.getId());
             return accountEntity;
         } catch (Exception e) {
@@ -64,75 +64,68 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountDetailsDto getAccountInfo(String currentUser) {
-        log.info("[x] Get Account info request with access id: {}.", currentUser);
-        AccountEntity accountEntity = getAccountByUsername(currentUser);
+    @Transactional(readOnly = true)
+    public AccountDetailsDto getAccountInfo(String username) {
+        log.info("[x] Get Account info request with access id: {}.", username);
+        AccountEntity accountEntity = accountDBService.getByUsername(username);
         PersonalDetails details = mapper.map(accountEntity, PersonalDetails.class);
         return new AccountDetailsDto(details);
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public boolean isUsernameOrEmailAvailable(String username, String email) {
+        if (!accountDBService.existUsernameOrEmail(username, email)) {
+            log.info("Username: {}, or email: {} is available", username, email);
+            return true;
+        }
+        log.warn("Username: {}, or email: {} is not available", username, email);
+        return false;
+    }
+
+    @Override
     @Transactional
-    public void updateAccountInfo(UpdateAccountRequest request, String currentUser) throws BadRequestException {
-        AccountEntity accountEntity = getAccountByUsername(currentUser);
+    public void updateAccountInfo(UpdateAccountRequest request, String username) throws BadRequestException {
+        AccountEntity accountEntity = accountDBService.getByUsername(username);
         boolean updated = accountEntity.update(request);
         if (updated) {
             log.info("[x] Successfully updated account1: {}, for user with name: {}", accountEntity.toString(), accountEntity.getUsername());
         } else {
-            log.warn("[x] Unable account2 update account1 info for current user: {}.", currentUser);
+            log.warn("[x] Unable account2 update account1 info for current user: {}.", username);
             throw new BadRequestException("Bad request for update.");
         }
     }
 
     @Override
-    public void existByUsernameAndEmail(String username, String email) throws RegistrationException {
-        if (accountRepository.existsByUsernameOrEmail(username, email)) {
-            log.warn("[x] Account with this username: {}, or email: {}, is already exist.", username, email);
-            throw new RegistrationException("Account with this username or email is already exist.");
-        }
-    }
-
-    @Async
-    @Override
     @SneakyThrows
     @Transactional
-    public void updateAvatar(MultipartFile avatar, String user) throws BadRequestException {
-        AccountEntity accountEntity = getAccountByUsername(user);
+    public void updateAvatar(MultipartFile avatar, String username) throws BadRequestException {
+        AccountEntity accountEntity = accountDBService.getByUsername(username);
         if (requireNonNull(avatar.getContentType()).equals(contentType)) {
             byte[] image = avatar.getBytes();
             accountEntity.setAvatar(image);
             log.info("[x] Successful update avatar with name: {}", avatar.getOriginalFilename());
         } else {
-            log.warn("[x] Failed update avatar with name: {}, for user: {}.", avatar.getOriginalFilename(), user);
+            log.warn("[x] Failed update avatar with name: {}, for user: {}.", avatar.getOriginalFilename(), username);
             throw new BadRequestException("File is not valid.");
         }
     }
 
-    @Override
-    public AccountEntity getAccountByUsername(String username) {
-        return accountRepository.findFirstByUsername(username).orElseThrow(() -> new NotFoundException("User not found."));
-    }
 
-    private List<AccountDto> getAccountListWithoutFriendStatus(String username, List<UUID> friendAccountsList) {
-        List<AccountDto> listAccounts = accountRepository.findAllByIdIsNotIn(friendAccountsList)
+    private List<AccountDto> getAccountListWithoutFriendStatus(List<UUID> friendAccountsList) {
+        return accountDBService.getAllByIdIsNotIn(friendAccountsList)
                 .stream()
-                .filter(e -> !e.getUsername().equals(username))
                 .map(e -> mapper.map(e, AccountDto.class))
                 .collect(Collectors.toList());
-        if (listAccounts.isEmpty()) {
-            listAccounts = accountRepository.findAll()
-                    .stream()
-                    .filter(e -> !e.getUsername().equals(username))
-                    .map(e -> mapper.map(e, AccountDto.class))
-                    .collect(Collectors.toList());
-        }
-        return listAccounts;
     }
 
     private List<UUID> getFriendIdsList(String username) {
-        return friendDBService.getAllFriendsByUsernameAndStatus(username, ACTIVE)
+        AccountEntity myAccount = accountDBService.getByUsername(username);
+        List<UUID> friendsIds = friendDBService.getAllFriendsByUsernameAndStatus(username, ACTIVE)
                 .stream()
                 .map(e -> e.getMyFriend(username).getId())
                 .collect(Collectors.toList());
+        friendsIds.add(myAccount.getId());
+        return friendsIds;
     }
 }

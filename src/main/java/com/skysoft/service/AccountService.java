@@ -9,18 +9,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface AccountService {
 
-    GetAllAccountsResponse getAllAccounts(String currentUser);
+    GetAllAccountsResponse getAllAccounts(String username);
 
     AccountEntity registerNewAccount(AccessRequestEntity accessRequestEntity);
 
-    AccountDetailsDto getAccountInfo(String currentUser);
+    AccountDetailsDto getAccountInfo(String username);
 
-    void updateAccountInfo(UpdateAccountRequest request, String currentUser);
+    boolean isUsernameOrEmailAvailable(String username, String email);
 
-    AccountEntity getAccountByUsername(String username);
+    void updateAccountInfo(UpdateAccountRequest request, String username);
 
-    void existByUsernameAndEmail(String firstName, String email);
-
-    void updateAvatar(MultipartFile avatar, String user);
+    void updateAvatar(MultipartFile avatar, String username);
 }
 

@@ -11,6 +11,7 @@ import com.skysoft.service.ConfirmationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -24,26 +25,27 @@ public class AccessServiceImpl implements AccessService {
     private final AccountService accountService;
 
     @Override
+    @Transactional
     public void createAccessRequest(AccessRequest request) {
+        String email = request.getEmail();
+        String username = request.getUsername();
         log.info("[x] Account registration request: {}", request);
-        if (!isEmailAndUsernameExistAndConfirmed(request.getEmail(), request.getUsername())) {
+        boolean isConfirmed = accessDBService.existConfirmedEmailAndUsername(email, username);
+        if (!isConfirmed) {
             AccessRequestEntity entity = accessDBService.save(request.toEntity());
             confirmationService.sendConfirmation(entity.getEmail(), entity.getId(), entity.getConfirmationCode());
-        }else {
+        } else {
             throw new BadRequestException("Email already confirmed.");
         }
     }
 
     @Override
+    @Transactional
     public void confirmAccess(UUID accessId, UUID confirmationCode) {
-        AccessRequestEntity entity = accessDBService.findByIdAndConfirmationCode(accessId, confirmationCode);
-        entity.setConfirmed(true);
-        AccountEntity accountEntity = accountService.registerNewAccount(entity);
-        accessDBService.confirmAccessRequest(entity, accountEntity);
-        log.info("[x] Access successfully confirmed for email: {}.", entity.getEmail());
+        AccessRequestEntity accessRequestEntity = accessDBService.findByIdAndConfirmationCode(accessId, confirmationCode);
+        AccountEntity accountEntity = accountService.registerNewAccount(accessRequestEntity);
+        accessRequestEntity.setAccount(accountEntity);
+        log.info("[x] Access successfully confirmed for email: {}.", accessRequestEntity.getEmail());
     }
 
-    private boolean isEmailAndUsernameExistAndConfirmed(String email, String username){
-        return accessDBService.existConfirmedEmailAndUsername(email, username);
-    }
 }

@@ -3,7 +3,6 @@ package com.skysoft.service;
 
 import com.skysoft.exception.NotFoundException;
 import com.skysoft.model.AccessRequestEntity;
-import com.skysoft.model.AccountEntity;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -28,5 +27,4 @@ public interface AccessDBService {
 
     boolean existConfirmedEmailAndUsername(String email, String username);
 
-    void confirmAccessRequest(AccessRequestEntity accessRequest, AccountEntity accountEntity);
 }

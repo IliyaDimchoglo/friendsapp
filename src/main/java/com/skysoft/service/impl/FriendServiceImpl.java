@@ -10,8 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,23 +26,22 @@ public class FriendServiceImpl implements FriendService {
     private final ModelMapper mapper;
 
     @Override
-    public GetAllFriendsResponse getAllFriends(String currentUser) {
-        List<PersonalDetails> personalDetailsList = friendDBService.getAllFriendsByUsernameAndStatus(currentUser, ACTIVE)
+    @Transactional(readOnly = true)
+    public GetAllFriendsResponse getAllFriends(String username) {
+        List<PersonalDetails> personalDetailsList = friendDBService.getAllFriendsByUsernameAndStatus(username, ACTIVE)
                 .stream()
-                .map(entity -> mapper.map(entity.getMyFriend(currentUser), PersonalDetails.class))
+                .map(entity -> mapper.map(entity.getMyFriend(username), PersonalDetails.class))
                 .collect(Collectors.toList());
-        log.info("[x] Get all friends with size: {}, for user: {}.", personalDetailsList.size(), currentUser);
+        log.info("[x] Get all friends with size: {}, for user: {}.", personalDetailsList.size(), username);
         return new GetAllFriendsResponse(personalDetailsList);
     }
 
     @Override
     @Transactional
-    public void deleteFriend(DeleteFriendRequest request, String currentUser) {
-        String friendUsername = request.getUsername();
-        FriendEntity friendEntity = friendDBService.getActiveByUsernameAndFriendName(// FIXME: 28.01.20 rename
-                currentUser, friendUsername);
+    public void deleteFriend(String friendName, String username) {
+        FriendEntity friendEntity = friendDBService.getActiveByUsernameAndFriendName(username, friendName);
         friendEntity.delete();
-        log.info("[x] Successful delete user: {}, account1 friends for current user: {}.", request.getUsername(), currentUser);
+        log.info("[x] Successful delete friend: {}, from friends for current user: {}.", friendName, username);
     }
 
 }

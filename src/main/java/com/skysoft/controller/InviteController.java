@@ -20,36 +20,32 @@ public class InviteController {
 
     @GetMapping
     public ResponseEntity<GetAllInvitationsResponse> getAllInvitations(CurrentUser currentUser) {
-        String user = currentUser.getUsername();
-        GetAllInvitationsResponse allInvitations = inviteService.getAllInvitations(user);
+        GetAllInvitationsResponse allInvitations = inviteService.getAllInvitations(currentUser.getUsername());
         return ResponseEntity.ok(allInvitations);
     }
 
     @PostMapping("/send")
     public ResponseEntity<Void> sendInvite(@Valid @RequestBody AddAccountToFriendsRequest request, CurrentUser currentUser) {
-        String user = currentUser.getUsername();
-        inviteService.sendInvite(request, user);// FIXME: 28.01.20 validate here
+        String friendName = request.getValidUsername(currentUser.getUsername());
+        inviteService.sendInvite(friendName, currentUser.getUsername());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/accept")
     public ResponseEntity<Void> acceptInvitation(@Valid @RequestBody InvitationRequest request, CurrentUser currentUser) {
-        String user = currentUser.getUsername();
-        inviteService.acceptInvitation(request, user);
+        inviteService.acceptInvitation(request.getUsername(), currentUser.getUsername());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/reject")
     public ResponseEntity<Void> rejectInvitation(@Valid @RequestBody InvitationRequest request, CurrentUser currentUser) {
-        String user = currentUser.getUsername();
-        inviteService.rejectInvitation(request, user);
+        inviteService.rejectInvitation(request.getUsername(), currentUser.getUsername());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/cancel")
     public ResponseEntity<Void> cancelInvite(@Valid @RequestBody InvitationRequest request, CurrentUser currentUser) {
-        String user = currentUser.getUsername();
-        inviteService.cancelInvite(request, user);
+        inviteService.cancelInvite(request.getUsername(), currentUser.getUsername());
         return ResponseEntity.ok().build();
     }
 }

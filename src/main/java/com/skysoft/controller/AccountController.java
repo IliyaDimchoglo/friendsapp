@@ -23,35 +23,31 @@ public class AccountController {
 
     @GetMapping
     public ResponseEntity<GetAllAccountsResponse> getAllAccounts(CurrentUser currentUser) {
-        String user = currentUser.getUsername();
-        GetAllAccountsResponse allAccounts = accountService.getAllAccounts(user);
+        GetAllAccountsResponse allAccounts = accountService.getAllAccounts(currentUser.getUsername());
         return ResponseEntity.ok(allAccounts);
     }
 
     @GetMapping("/info")
     public ResponseEntity<AccountDetailsDto> getAccountInfo(CurrentUser currentUser) {
-        String user = currentUser.getUsername();
-        AccountDetailsDto accountInfo = accountService.getAccountInfo(user);
+        AccountDetailsDto accountInfo = accountService.getAccountInfo(currentUser.getUsername());
         return ResponseEntity.ok(accountInfo);
     }
 
     @PatchMapping("/update")
     public ResponseEntity<Void> updateAccountInfo(@Valid @RequestBody UpdateAccountRequest updateAccountRequest, CurrentUser currentUser) {
-        String user = currentUser.getUsername();
-        accountService.updateAccountInfo(updateAccountRequest, user);
+        accountService.updateAccountInfo(updateAccountRequest, currentUser.getUsername());
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/avatar")
     public ResponseEntity<Void> updateAvatar(@RequestParam(name = "avatar") MultipartFile avatar, CurrentUser currentUser) {
-        String user = currentUser.getUsername();
-        accountService.updateAvatar(avatar, user);
+        accountService.updateAvatar(avatar, currentUser.getUsername());
         return ResponseEntity.ok().build();
     }
 
     @PostMapping
-    public ResponseEntity<Void> getAvailabilityUser(@Valid @RequestBody AvailabilityUserRequest request) {
-        accountService.existByUsernameAndEmail(request.getUsername(), request.getEmail());
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Boolean> userAvailability(@Valid @RequestBody AvailabilityUserRequest request) {
+        boolean isAvailable = accountService.isUsernameOrEmailAvailable(request.getUsername(), request.getEmail());
+        return ResponseEntity.ok(isAvailable);
     }
 }

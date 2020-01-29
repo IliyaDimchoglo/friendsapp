@@ -9,9 +9,9 @@ import java.util.Optional;
 
 public interface InviteDBService {
 
-    List<InviteEntity> findAllInvitesByFriendUsernameAndStatus(String username, InviteStatus inviteStatus);
+    List<InviteEntity> getPendingInvitesByUsername(String username);
 
-    List<InviteEntity> findAllInvitesByAccountUsernameAndStatus(String username, InviteStatus inviteStatus);
+    List<InviteEntity> getPendingInvitesByFriendName(String username);
 
     boolean existPendingInvite(String username, String friendName);
 

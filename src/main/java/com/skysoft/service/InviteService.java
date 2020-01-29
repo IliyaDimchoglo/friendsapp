@@ -1,19 +1,16 @@
 package com.skysoft.service;
 
-import com.skysoft.config.security.jwt.CurrentUser;
-import com.skysoft.dto.request.AddAccountToFriendsRequest;
-import com.skysoft.dto.request.InvitationRequest;
 import com.skysoft.dto.response.GetAllInvitationsResponse;
 
 public interface InviteService {
 
-    GetAllInvitationsResponse getAllInvitations(String currentUser);
+    GetAllInvitationsResponse getAllInvitations(String username);
 
-    void acceptInvitation(InvitationRequest request, String currentUser);
+    void acceptInvitation(String friendName, String username);
 
-    void sendInvite(AddAccountToFriendsRequest request, String currentUser);
+    void sendInvite(String friendName, String username);
 
-    void rejectInvitation(InvitationRequest request, String currentUser);
+    void rejectInvitation(String friendName, String username);
 
-    void cancelInvite(InvitationRequest request, String currentUser);
+    void cancelInvite(String friendName, String username);
 }

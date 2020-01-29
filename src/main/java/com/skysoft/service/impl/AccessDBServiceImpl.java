@@ -1,7 +1,6 @@
 package com.skysoft.service.impl;
 
 import com.skysoft.model.AccessRequestEntity;
-import com.skysoft.model.AccountEntity;
 import com.skysoft.repository.AccessRepository;
 import com.skysoft.service.AccessDBService;
 import lombok.RequiredArgsConstructor;
@@ -36,12 +35,5 @@ public class AccessDBServiceImpl implements AccessDBService {
     @Override
     public boolean existConfirmedEmailAndUsername(String email, String username) {
         return accessRepository.existsByEmailAndUsernameAndConfirmedTrue(email, username);
-    }
-
-    @Override
-    public void confirmAccessRequest(AccessRequestEntity accessRequest, AccountEntity accountEntity) {
-        log.info("[x] Confirm access request with id: {}.", accessRequest.getId());
-        accessRequest.setAccount(accountEntity);
-        accessRepository.save(accessRequest);
     }
 }

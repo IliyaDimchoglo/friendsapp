@@ -1,7 +1,6 @@
 package com.skysoft.service.impl;
 
 import com.skysoft.model.InviteEntity;
-import com.skysoft.model.InviteStatus;
 import com.skysoft.repository.InviteRepository;
 import com.skysoft.service.InviteDBService;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +20,13 @@ public class InviteDbServiceImpl implements InviteDBService {
     private final InviteRepository inviteRepository;
 
     @Override
-    public List<InviteEntity> findAllInvitesByFriendUsernameAndStatus(String username, InviteStatus inviteStatus) {
-        return inviteRepository.findAllByAccount2_UsernameAndInviteStatus(username, inviteStatus);
+    public List<InviteEntity> getPendingInvitesByUsername(String username) {
+        return inviteRepository.findAllByAccount2_UsernameAndInviteStatus(username, PENDING);
     }
 
     @Override
-    public List<InviteEntity> findAllInvitesByAccountUsernameAndStatus(String username, InviteStatus inviteStatus) {
-        return inviteRepository.findAllByAccount1_UsernameAndInviteStatus(username, inviteStatus);
+    public List<InviteEntity> getPendingInvitesByFriendName(String username) {
+        return inviteRepository.findAllByAccount1_UsernameAndInviteStatus(username, PENDING);
     }
 
     @Override
