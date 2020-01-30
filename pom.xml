@@ -79,7 +79,11 @@
             <artifactId>libphonenumber</artifactId>
             <version>[8.9,)</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-s3</artifactId>
+            <version>1.11.705</version>
+        </dependency>
         <dependency>
             <groupId>org.junit</groupId>
             <artifactId>junit5-engine</artifactId>

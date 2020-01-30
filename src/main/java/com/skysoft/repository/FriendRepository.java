@@ -3,11 +3,13 @@ package com.skysoft.repository;
 import com.skysoft.model.FriendEntity;
 import com.skysoft.model.FriendStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Repository
 public interface FriendRepository extends JpaRepository<FriendEntity, UUID> {
 
     List<FriendEntity> findFriendEntitiesByAccount1_UsernameAndStatusOrAccount2_UsernameAndStatus(String username, FriendStatus accountStatus, String friendName, FriendStatus status);

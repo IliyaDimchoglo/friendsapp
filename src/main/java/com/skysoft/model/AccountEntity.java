@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -32,15 +33,14 @@ public class AccountEntity {
     @UpdateTimestamp
     private Instant updatedTime;
 
-    @Lob
-    @Type(type = "org.hibernate.type.ImageType")
-    private byte[] avatar;
-
     @Column(unique = true)
     private String username;
 
     @Column(unique = true)
     private String email;
+
+    @ElementCollection
+    private List<Avatar> avatars;
 
     private String password;
 
@@ -78,5 +78,8 @@ public class AccountEntity {
         return updated;
     }
 
+    public void addAvatar(Avatar avatar){
+        avatars.add(avatar);
+    }
 
 }

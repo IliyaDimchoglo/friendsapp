@@ -27,7 +27,7 @@ public class ConfirmationServiceImpl implements ConfirmationService {
         log.info("[x] Ready send confirmation : {}, code: {}", email, confirmationCode);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
-        message.setText(text + "\n" + "http://localhost:8888/api/access/confirm?id=" + id +
+        message.setText(text + "\n" + "http://localhost:8088/api/access/confirm?id=" + id +
                 "&confirmationCode=" + confirmationCode);
         mailSender.send(message);
         log.info("[x] Confirmation send successfully.");

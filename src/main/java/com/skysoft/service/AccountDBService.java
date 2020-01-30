@@ -5,7 +5,6 @@ import com.skysoft.model.AccountEntity;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface AccountDBService {
 
@@ -17,8 +16,7 @@ public interface AccountDBService {
 
     boolean existUsernameOrEmail(String username, String email);
 
-    List<AccountEntity> getAllByIdIsNotIn(List<UUID> ids);
-
+    List<AccountEntity> getAllNotFriendsByAccountId(String accountId);
     AccountEntity save(AccountEntity account);
 
 }

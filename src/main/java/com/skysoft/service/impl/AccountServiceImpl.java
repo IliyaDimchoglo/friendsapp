@@ -8,25 +8,24 @@ import com.skysoft.dto.response.GetAllAccountsResponse;
 import com.skysoft.exception.BadRequestException;
 import com.skysoft.model.AccessRequestEntity;
 import com.skysoft.model.AccountEntity;
+import com.skysoft.model.Avatar;
 import com.skysoft.service.AccountDBService;
 import com.skysoft.service.AccountService;
-import com.skysoft.service.FriendDBService;
+import com.skysoft.service.aws.AvatarType;
+import com.skysoft.service.aws.api.AmazonS3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.skysoft.model.FriendStatus.ACTIVE;
-import static java.util.Objects.requireNonNull;
+import static com.skysoft.service.aws.AvatarType.UNSUPPORTED;
+import static com.skysoft.service.aws.AvatarType.getIconType;
 
 @Slf4j
 @Service
@@ -34,17 +33,17 @@ import static java.util.Objects.requireNonNull;
 public class AccountServiceImpl implements AccountService {
 
     private final AccountDBService accountDBService;
-    private final FriendDBService friendDBService;
+    private final AmazonS3Service amazonS3Service;
     private final ModelMapper mapper;
-
-    @Value("${file.type}")
-    private String contentType;
 
     @Override
     @Transactional(readOnly = true)
     public GetAllAccountsResponse getAllAccounts(String username) {
-        List<UUID> friendAccountsList = getFriendIdsList(username);
-        List<AccountDto> accountDtoList = getAccountListWithoutFriendStatus(friendAccountsList);
+        String accountId = accountDBService.getByUsername(username).getId().toString();
+        List<AccountDto> accountDtoList = accountDBService.getAllNotFriendsByAccountId(accountId)
+                .stream()
+                .map(e -> mapper.map(e, AccountDto.class))
+                .collect(Collectors.toList());
         log.info("[x] Get All accounts without friend status: {}", accountDtoList.toString());
         return GetAllAccountsResponse.of(accountDtoList);
     }
@@ -101,31 +100,15 @@ public class AccountServiceImpl implements AccountService {
     @Transactional
     public void updateAvatar(MultipartFile avatar, String username) throws BadRequestException {
         AccountEntity accountEntity = accountDBService.getByUsername(username);
-        if (requireNonNull(avatar.getContentType()).equals(contentType)) {
-            byte[] image = avatar.getBytes();
-            accountEntity.setAvatar(image);
-            log.info("[x] Successful update avatar with name: {}", avatar.getOriginalFilename());
+        AvatarType avatarType = getIconType(avatar.getContentType());
+        if(!avatarType.equals(UNSUPPORTED)){
+            String avatarUrl = amazonS3Service.uploadAvatar(avatar, avatarType);
+            accountEntity.addAvatar(new Avatar(avatarUrl));
+            accountDBService.save(accountEntity);
+            log.info("[x] Successful update avatar for user: {}", username);
         } else {
-            log.warn("[x] Failed update avatar with name: {}, for user: {}.", avatar.getOriginalFilename(), username);
+            log.warn("[x] Failed update avatar for user: {}.", username);
             throw new BadRequestException("File is not valid.");
         }
-    }
-
-
-    private List<AccountDto> getAccountListWithoutFriendStatus(List<UUID> friendAccountsList) {
-        return accountDBService.getAllByIdIsNotIn(friendAccountsList)
-                .stream()
-                .map(e -> mapper.map(e, AccountDto.class))
-                .collect(Collectors.toList());
-    }
-
-    private List<UUID> getFriendIdsList(String username) {
-        AccountEntity myAccount = accountDBService.getByUsername(username);
-        List<UUID> friendsIds = friendDBService.getAllFriendsByUsernameAndStatus(username, ACTIVE)
-                .stream()
-                .map(e -> e.getMyFriend(username).getId())
-                .collect(Collectors.toList());
-        friendsIds.add(myAccount.getId());
-        return friendsIds;
     }
 }

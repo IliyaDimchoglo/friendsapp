@@ -1,12 +1,12 @@
 server:
-  port: 8888
+  port: 8088
 spring:
   mail:
     host: smtp.gmail.com
     port: 587
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
-    message: Thank you for registering. Please click on the below link account2 activate your account1.
+    message: Thank you for registering. Please click on the below link activate your account.
     default-encoding: UTF-8
     properties:
       mail:
@@ -50,4 +50,9 @@ logging:
     com.zaxxer.hikari: warn
     org.hibernate: warn
     org.apache: warn
-file.type: image/jpeg
+aws:
+  login: ${AWS_ACCESS_KEY}
+  password: ${AWS_SECRET_ACCESS_KEY}
+amazon-client:
+  s3:
+    bucket-name: friendsapp-avatar-bucket

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +26,8 @@ public class AccountDBServiceImpl implements AccountDBService {
     }
 
     @Override
-    public List<AccountEntity> getAllByIdIsNotIn(List<UUID> ids) {
-        return accountRepository.findAllByIdIsNotIn(ids);
+    public List<AccountEntity> getAllNotFriendsByAccountId(String accountId) {
+        return accountRepository.findAllNotFriendsByAccountId(accountId);
     }
 
     @Override
