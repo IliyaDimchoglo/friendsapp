@@ -1,4 +1,3 @@
-/*
 package com;
 
 import com.skysoft.config.security.jwt.CurrentUser;
@@ -9,6 +8,7 @@ import com.skysoft.model.AccountEntity;
 import com.skysoft.model.FriendEntity;
 import com.skysoft.model.FriendStatus;
 import com.skysoft.model.InviteEntity;
+import com.skysoft.service.AccountDBService;
 import com.skysoft.service.AccountService;
 import com.skysoft.service.FriendDBService;
 import com.skysoft.service.InviteDBService;
@@ -35,7 +35,7 @@ import static org.mockito.Mockito.*;
 public class InviteServiceTest {
 
     @Mock
-    private AccountService accountService;
+    private AccountDBService accountService;
 
     @Mock
     private InviteDBService inviteDBService;
@@ -63,49 +63,45 @@ public class InviteServiceTest {
 
     @Test
     public void sendInvite() {
-        when(inviteDBService.existPendingInvite(username, friendName, PENDING)).thenReturn(false);
-        when(accountService.getAccountByUsername(username)).thenReturn(new AccountEntity());
+        when(inviteDBService.existPendingInvite(username, friendName)).thenReturn(false);
+        when(accountService.getByUsername(username)).thenReturn(new AccountEntity());
         doNothing().when(inviteDBService).save(any());
 
-        inviteService.sendInvite(request, username);
+        inviteService.sendInvite(friendName, username);
 
-        verify(inviteService, times(1)).sendInvite(request, username);
-        verify(inviteDBService, times(1)).existPendingInvite(username, friendName, PENDING);
+        verify(inviteService, times(1)).sendInvite(friendName, username);
+        verify(inviteDBService, times(1)).existPendingInvite(username, friendName);
     }
 
     @Test
     public void failSendInvite() {
-        when(inviteDBService.existPendingInvite(username, friendName, PENDING)).thenReturn(true);
-        assertThrows(BadRequestException.class, () -> inviteService.sendInvite(request, username));
+        when(inviteDBService.existPendingInvite(username, friendName)).thenReturn(true);
+        assertThrows(BadRequestException.class, () -> inviteService.sendInvite(friendName, username));
     }
 
     @Test
     public void acceptInvitationWhenFriendsNotExist() {
-        InvitationRequest request = new InvitationRequest(friendName);
-        CurrentUser user = new CurrentUser(username);
         when(inviteDBService.getInviteByUsernameAndFriendNameInStatusPending(any(), any())).thenReturn(new InviteEntity());
-        when(friendDBService.existByUsernameAndFriendNameAndStatusActive(username, friendName)).thenReturn(Optional.empty());
+        when(friendDBService.existByUsernameAndFriendNameAndStatusActive(username, friendName)).thenReturn(true);
         doNothing().when(inviteDBService).save(any());
-        when(accountService.getAccountByUsername(username)).thenReturn(new AccountEntity());
+        when(accountService.getByUsername(username)).thenReturn(new AccountEntity());
         doNothing().when(friendDBService).save(any());
 
-        inviteService.acceptInvitation(request, username);
+        inviteService.acceptInvitation(friendName, username);
 
-        verify(inviteService, times(1)).acceptInvitation(request, username);
+        verify(inviteService, times(1)).acceptInvitation(friendName, username);
     }
 
     @Test
     public void acceptInvitationWhenFriendsDeleted() {
-        InvitationRequest request = new InvitationRequest(friendName);
-        CurrentUser user = new CurrentUser(username);
-        FriendEntity entity = new FriendEntity();
+          FriendEntity entity = new FriendEntity();
         entity.setStatus(FriendStatus.DELETED);
         when(inviteDBService.getInviteByUsernameAndFriendNameInStatusPending(any(), any())).thenReturn(new InviteEntity());
-        when(friendDBService.existByUsernameAndFriendNameAndStatusActive(username, friendName)).thenReturn(Optional.of(entity));
+        when(friendDBService.existByUsernameAndFriendNameAndStatusActive(username, friendName)).thenReturn(false);
 
-        inviteService.acceptInvitation(request, username);
+        inviteService.acceptInvitation(friendName, username);
 
-        verify(inviteService, times(1)).acceptInvitation(request, username);
+        verify(inviteService, times(1)).acceptInvitation(friendName, username);
     }
 
     @Test
@@ -115,20 +111,18 @@ public class InviteServiceTest {
 
     @Test
     public void rejectInvitationTest() {
-        InvitationRequest request = new InvitationRequest(friendName);
-        CurrentUser user = new CurrentUser(username);
         when(inviteDBService.getInviteByUsernameAndFriendNameInStatusPending(any(), any())).thenReturn(new InviteEntity());
 
-        inviteService.rejectInvitation(request, username);
+        inviteService.rejectInvitation(friendName, username);
 
-        verify(inviteService, times(1)).rejectInvitation(request, username);
+        verify(inviteService, times(1)).rejectInvitation(friendName, username);
     }
 
     @Test
     public void failRejectInvitation() {
-        assertThrows(Exception.class, () -> {
-            inviteService.rejectInvitation(new InvitationRequest(randomUUID().toString()), username);
-        });
+        assertThrows(Exception.class, () ->
+            inviteService.rejectInvitation(randomUUID().toString(), username)
+        );
     }
 
     @Test
@@ -137,9 +131,9 @@ public class InviteServiceTest {
         CurrentUser user = new CurrentUser(username);
         when(inviteDBService.getInviteByUsernameAndFriendNameInStatusPending(any(), any())).thenReturn(new InviteEntity());
 
-        inviteService.cancelInvite(request, username);
+        inviteService.cancelInvite(friendName, username);
 
-        verify(inviteService, times(1)).cancelInvite(request, username);
+        verify(inviteService, times(1)).cancelInvite(friendName, username);
         verify(inviteDBService, times(1)).getInviteByUsernameAndFriendNameInStatusPending(any(), any());
     }
 
@@ -150,14 +144,13 @@ public class InviteServiceTest {
 
     @Test
     public void getAllInvitationsTest() {
-        when(inviteDBService.getPendingInvitesByFriendName(username, PENDING)).thenReturn(Collections.singletonList(new InviteEntity()));
-        when(inviteDBService.getAllInvitesUsernameAndStatus(username, PENDING)).thenReturn(Collections.singletonList(new InviteEntity()));
+        when(inviteDBService.getPendingInvitesByFriendName(username)).thenReturn(Collections.singletonList(new InviteEntity()));
+        when(inviteDBService.getPendingInvitesByUsername(username)).thenReturn(Collections.singletonList(new InviteEntity()));
 
         inviteService.getAllInvitations(username);
 
-        verify(inviteDBService, times(1)).getPendingInvitesByFriendName(username, PENDING);
-        verify(inviteDBService, times(1)).getAllInvitesUsernameAndStatus(username, PENDING);
+        verify(inviteDBService, times(1)).getPendingInvitesByFriendName(username);
+        verify(inviteDBService, times(1)).getPendingInvitesByUsername(username);
         verify(inviteService, times(1)).getAllInvitations(username);
     }
 }
-*/

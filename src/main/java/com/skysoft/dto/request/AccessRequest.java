@@ -2,13 +2,12 @@ package com.skysoft.dto.request;
 
 
 import com.skysoft.model.AccessRequestEntity;
-import com.sun.istack.internal.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.UUID;
 
@@ -25,7 +24,7 @@ public class AccessRequest {
     @Length(min = 4, max = 9)
     private String username;
 
-    @NonNull
+    @javax.validation.constraints.NotNull
     @Length(min = 4, max = 9)
     private String password;
 

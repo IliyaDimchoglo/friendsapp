@@ -68,6 +68,7 @@ public class AmazonS3ServiceImpl implements AmazonS3Service {
         objectMetadata.setContentLength(file.getSize());
         return objectMetadata;
     }
+
     private String getUniqueAvatarName() {
         return UUID.randomUUID().toString().replace("-", "");
     }

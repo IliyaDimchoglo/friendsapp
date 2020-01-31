@@ -1,4 +1,3 @@
-/*
 package com;
 
 import com.skysoft.dto.request.DeleteFriendRequest;
@@ -60,13 +59,12 @@ public class FriendServiceTest {
 
     @Test
     public void deleteFriendTest() {
-        DeleteFriendRequest deleteFriendRequest = new DeleteFriendRequest("bob");
         String currentUser = "pop";
-        when(friendDBService.getActiveByUsernameAndFriendName(anyString(), anyString(), any())).thenReturn(friendEntity);
+        when(friendDBService.getActiveByUsernameAndFriendName("bob", "pop")).thenReturn(friendEntity);
 
-        friendService.deleteFriend(deleteFriendRequest, currentUser);
+        friendService.deleteFriend("bob", currentUser);
 
-        verify(friendService, times(1)).deleteFriend(deleteFriendRequest, currentUser);
+        verify(friendService, times(1)).deleteFriend("bob", currentUser);
     }
 
     @Test
@@ -74,4 +72,3 @@ public class FriendServiceTest {
         Assertions.assertThrows(Exception.class, () -> friendService.deleteFriend(any(), any()));
     }
 }
-*/

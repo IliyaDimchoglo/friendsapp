@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 @Controller
 @RequiredArgsConstructor
@@ -40,7 +41,7 @@ public class AccountController {
     }
 
     @PatchMapping("/avatar")
-    public ResponseEntity<Void> updateAvatar(@RequestParam(name = "avatar") MultipartFile avatar, CurrentUser currentUser) {
+    public ResponseEntity<Void> updateAvatar(@RequestParam(name = "avatar") @NotNull MultipartFile avatar, CurrentUser currentUser) {
         accountService.updateAvatar(avatar, currentUser.getUsername());
         return ResponseEntity.ok().build();
     }
